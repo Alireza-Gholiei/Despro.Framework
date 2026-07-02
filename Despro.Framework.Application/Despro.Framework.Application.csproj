@@ -2,25 +2,36 @@
 
 	<PropertyGroup>
 		<TargetFramework>net10.0</TargetFramework>
+
 		<Title>Despro Framework Application</Title>
 		<PackageId>Despro.Framework.Application</PackageId>
 		<Product>Despro.Framework.Application</Product>
+
 		<PackageTags>Despro Framework Application</PackageTags>
 		<Description>Application Framework For Despro</Description>
+
+		<Version>2.0.6</Version>
+
 		<Authors>Despro Team</Authors>
+
 		<PackageIcon>Framework.png</PackageIcon>
-		<Version>2.0.5</Version>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+
+		<RepositoryUrl>https://github.com/Alireza-Gholiei/Despro.Framework.git</RepositoryUrl>
+
 		<LangVersion>latest</LangVersion>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<RepositoryUrl>https://github.com/Alireza-Gholiei/Despro.Framework.git</RepositoryUrl>
-		<NuGetAudit>false</NuGetAudit>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<None Include="Framework.png">
 			<Pack>True</Pack>
 			<PackagePath></PackagePath>
+		</None>
+		<None Include="README.md">
+			<Pack>True</Pack>
+			<PackagePath>/</PackagePath>
 		</None>
 	</ItemGroup>
 
@@ -30,7 +41,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="MediatR" Version="14.0.0" />
+		<PackageReference Include="MediatR" Version="14.2.0" />
 	</ItemGroup>
 
 	<ItemGroup>

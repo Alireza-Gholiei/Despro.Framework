@@ -2,25 +2,36 @@
 
 	<PropertyGroup>
 		<TargetFramework>net10.0</TargetFramework>
+
 		<Title>Despro Framework Base</Title>
 		<PackageId>Despro.Framework.Base</PackageId>
 		<Product>Despro.Framework.Base</Product>
+
 		<PackageTags>Despro Framework Base</PackageTags>
 		<Description>Base Framework For Despro</Description>
+
+		<Version>2.1.1</Version>
+
 		<Authors>Despro Team</Authors>
+
 		<PackageIcon>Framework.png</PackageIcon>
-		<Version>2.1.0</Version>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+
+		<RepositoryUrl>https://github.com/Alireza-Gholiei/Despro.Framework.git</RepositoryUrl>
+
 		<LangVersion>latest</LangVersion>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<RepositoryUrl>https://github.com/Alireza-Gholiei/Despro.Framework.git</RepositoryUrl>
-		<NuGetAudit>false</NuGetAudit>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<None Include="Framework.png">
 			<Pack>True</Pack>
 			<PackagePath></PackagePath>
+		</None>
+		<None Include="README.md">
+			<Pack>True</Pack>
+			<PackagePath>/</PackagePath>
 		</None>
 	</ItemGroup>
 
@@ -31,9 +42,9 @@
 	<ItemGroup>
 		<PackageReference Include="FluentValidation" Version="12.1.1" />
 		<PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
-		<PackageReference Include="Mapster" Version="7.4.0" />
-		<PackageReference Include="MediatR" Version="14.0.0" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.2">
+		<PackageReference Include="Mapster" Version="10.0.10" />
+		<PackageReference Include="MediatR" Version="14.2.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.9">
 			<PrivateAssets>all</PrivateAssets>
 		</PackageReference>
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />

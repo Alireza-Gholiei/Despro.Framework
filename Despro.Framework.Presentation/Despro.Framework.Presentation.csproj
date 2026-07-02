@@ -2,25 +2,36 @@
 
 	<PropertyGroup>
 		<TargetFramework>net10.0</TargetFramework>
+
 		<Title>Despro Framework Presentation</Title>
 		<PackageId>Despro.Framework.Presentation</PackageId>
 		<Product>Despro.Framework.Presentation</Product>
+
 		<PackageTags>Despro Framework Presentation</PackageTags>
 		<Description>Presentation Framework For Despro</Description>
+
+		<Version>2.10.2</Version>
+
 		<Authors>Despro Team</Authors>
+
 		<PackageIcon>Framework.png</PackageIcon>
-		<Version>2.10.1</Version>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+
+		<RepositoryUrl>https://github.com/Alireza-Gholiei/Despro.Framework.git</RepositoryUrl>
+
 		<LangVersion>latest</LangVersion>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<RepositoryUrl>https://github.com/Alireza-Gholiei/Despro.Framework.git</RepositoryUrl>
-		<NuGetAudit>false</NuGetAudit>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<None Include="Framework.png">
 			<Pack>True</Pack>
 			<PackagePath></PackagePath>
+		</None>
+		<None Include="README.md">
+			<Pack>True</Pack>
+			<PackagePath>/</PackagePath>
 		</None>
 	</ItemGroup>
 
@@ -29,15 +40,15 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Asp.Versioning.Http" Version="8.1.1" />
-		<PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.1.1" />
-		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.2" />
-		<PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="10.0.2" />
-		<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.2" />
-		<PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.0" />
-		<PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="10.1.0" />
-		<PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="10.1.0" />
-		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.15.0" />
+		<PackageReference Include="Asp.Versioning.Http" Version="10.0.0" />
+		<PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="10.0.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.9" />
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="10.0.9" />
+		<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.9" />
+		<PackageReference Include="Swashbuckle.AspNetCore" Version="10.2.3" />
+		<PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="10.2.3" />
+		<PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="10.2.3" />
+		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.19.1" />
 	</ItemGroup>
 
 	<ItemGroup>
