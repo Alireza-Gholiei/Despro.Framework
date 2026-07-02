@@ -31,13 +31,6 @@ jobs:
       - name: Pack
         run: dotnet pack -c Release --no-build -o ./packages
 
-      - name: Publish GitHub Packages
-        run: |
-          dotnet nuget push "packages/*.nupkg" \
-            --skip-duplicate \
-            --source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" \
-            --api-key "${{ secrets.GITHUB_TOKEN }}"
-
       - name: Publish NuGet
         run: |
           dotnet nuget push "packages/*.nupkg" \
