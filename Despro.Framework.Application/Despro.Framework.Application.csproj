@@ -1,0 +1,44 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<Title>Despro Framework Application</Title>
+		<PackageId>Despro.Framework.Application</PackageId>
+		<Product>Despro.Framework.Application</Product>
+		<PackageTags>Despro Framework Application</PackageTags>
+		<Description>Application Framework For Despro</Description>
+		<Authors>Despro Team</Authors>
+		<PackageIcon>Framework.png</PackageIcon>
+		<Version>2.0.5</Version>
+		<LangVersion>latest</LangVersion>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<RepositoryUrl>https://github.com/Alireza-Gholiei/Despro.Framework.git</RepositoryUrl>
+		<NuGetAudit>false</NuGetAudit>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="Framework.png">
+			<Pack>True</Pack>
+			<PackagePath></PackagePath>
+		</None>
+	</ItemGroup>
+
+
+	<ItemGroup>
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="MediatR" Version="14.0.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Despro.Framework.Base\Despro.Framework.Base.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="ApplicationExtensions\" />
+	</ItemGroup>
+
+</Project>

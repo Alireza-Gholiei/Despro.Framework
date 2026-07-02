@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<Title>Despro Framework Domain</Title>
+		<PackageId>Despro.Framework.Domain</PackageId>
+		<Product>Despro.Framework.Domain</Product>
+		<PackageTags>Despro Framework Domain</PackageTags>
+		<Description>Domain Framework For Despro</Description>
+		<Authors>Despro Team</Authors>
+		<PackageIcon>Framework.png</PackageIcon>
+		<Version>2.0.4</Version>
+		<LangVersion>latest</LangVersion>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<RepositoryUrl>https://github.com/Alireza-Gholiei/Despro.Framework.git</RepositoryUrl>
+		<NuGetAudit>false</NuGetAudit>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="Framework.png">
+			<Pack>True</Pack>
+			<PackagePath></PackagePath>
+		</None>
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Despro.Framework.Base\Despro.Framework.Base.csproj" />
+	</ItemGroup>
+
+</Project>

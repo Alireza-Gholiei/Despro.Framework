@@ -1,0 +1,50 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<Title>Despro Framework Infrastructure</Title>
+		<PackageId>Despro.Framework.Infrastructure</PackageId>
+		<Product>Despro.Framework.Infrastructure</Product>
+		<PackageTags>Despro Framework Infrastructure</PackageTags>
+		<Description>Infrastructure Framework For Despro</Description>
+		<Authors>Despro Team</Authors>
+		<PackageIcon>Framework.png</PackageIcon>
+		<Version>2.1.3</Version>
+		<LangVersion>latest</LangVersion>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<RepositoryUrl>https://github.com/Alireza-Gholiei/Despro.Framework.git</RepositoryUrl>
+		<NuGetAudit>false</NuGetAudit>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="Framework.png">
+			<Pack>True</Pack>
+			<PackagePath></PackagePath>
+		</None>
+	</ItemGroup>
+
+	<ItemGroup>
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Dapper" Version="2.1.66" />
+		<PackageReference Include="FluentValidation" Version="12.1.1" />
+		<PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
+		<PackageReference Include="MediatR" Version="14.0.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.2" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.2" />
+		<PackageReference Include="MongoDB.Driver" Version="3.6.0" />
+		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.15.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Despro.Framework.Base\Despro.Framework.Base.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="InfrastructureExtentisions\" />
+	</ItemGroup>
+
+</Project>
