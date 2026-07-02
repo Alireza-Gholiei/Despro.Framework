@@ -120,6 +120,7 @@ https://api.nuget.org/v3/index.json
 
 ```bash
 dotnet add package Despro.Framework.Base
+dotnet add package Despro.Framework.Domain
 dotnet add package Despro.Framework.Application
 dotnet add package Despro.Framework.Infrastructure
 dotnet add package Despro.Framework.Presentation
@@ -129,7 +130,6 @@ dotnet add package Despro.Framework.Presentation.Api          # controller-based
 dotnet add package Despro.Framework.Presentation.MinimalApi   # minimal API
 
 # Optional add-ons:
-dotnet add package Despro.Framework.Domain
 dotnet add package Despro.Framework.WebClient
 ```
 
