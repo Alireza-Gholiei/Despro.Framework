@@ -119,7 +119,6 @@ https://api.nuget.org/v3/index.json
 ### Install packages
 
 ```bash
-dotnet add package Despro.Framework.Base
 dotnet add package Despro.Framework.Domain
 dotnet add package Despro.Framework.Application
 dotnet add package Despro.Framework.Infrastructure
@@ -128,6 +127,9 @@ dotnet add package Despro.Framework.Presentation
 # Pick the presentation flavor your project uses:
 dotnet add package Despro.Framework.Presentation.Api          # controller-based
 dotnet add package Despro.Framework.Presentation.MinimalApi   # minimal API
+
+# Installed With All Packages:
+dotnet add package Despro.Framework.Base
 
 # Optional add-ons:
 dotnet add package Despro.Framework.WebClient
