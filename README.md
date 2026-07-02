@@ -9,7 +9,7 @@ dependency-injection calls.
 
 - **Target framework:** `net10.0`
 - **Core package version (`Despro.Framework.Base`):** `2.1.0`
-- **Distribution:** private NuGet feed (`MeganHub`)
+- **Distribution:** NuGet feed
 
 ---
 
@@ -110,18 +110,10 @@ graph TD
 
 ## Installation / NuGet
 
-All packages are published to the private **`MeganHub`** feed:
+All packages are published to the **`Nuget`** feed:
 
 ```
-https://hub.megan.ir/nuget/index.json
-```
-
-### Add the feed
-
-Register the feed with the .NET CLI:
-
-```bash
-dotnet nuget add source "https://hub.megan.ir/nuget/index.json" --name MeganHub
+https://api.nuget.org/v3/index.json
 ```
 
 ### Install packages
