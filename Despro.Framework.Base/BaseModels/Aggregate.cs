@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Despro.Framework.Base.BaseModels;
 
-public abstract class BaseEntity
+public abstract class Aggregate
 {
     [Key, Column(Order = 0)]
     public long Id { get; private set; }

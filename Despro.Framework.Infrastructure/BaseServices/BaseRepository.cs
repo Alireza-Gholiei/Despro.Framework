@@ -14,7 +14,7 @@ using System.Reflection;
 
 namespace Despro.Framework.Infrastructure.BaseServices;
 
-public abstract class BaseRepository<TEntity> : IBaseRepository<TEntity> where TEntity : BaseEntity
+public abstract class BaseRepository<TEntity> : IBaseRepository<TEntity> where TEntity : Aggregate
 {
     private readonly EfBaseContext _context;
     private readonly DbSet<TEntity> _dbTable;
@@ -281,12 +281,12 @@ public abstract class BaseRepository<TEntity> : IBaseRepository<TEntity> where T
         return _dbTable.IgnoreQueryFilters().AsNoTracking();
     }
 
-    public IQueryable<TNewEntity> Context<TNewEntity>() where TNewEntity : BaseEntity
+    public IQueryable<TNewEntity> Context<TNewEntity>() where TNewEntity : Aggregate
     {
         return _context.Set<TNewEntity>().AsNoTracking();
     }
 
-    public IQueryable<TNewEntity> ContextWithDelete<TNewEntity>() where TNewEntity : BaseEntity
+    public IQueryable<TNewEntity> ContextWithDelete<TNewEntity>() where TNewEntity : Aggregate
     {
         return _context.Set<TNewEntity>().IgnoreQueryFilters().AsNoTracking();
     }
@@ -379,7 +379,7 @@ public abstract class BaseRepository<TEntity> : IBaseRepository<TEntity> where T
 
     private static readonly ConcurrentDictionary<Type, PropertyInfo[]> _navigationPropertiesCache = new();
 
-    private void ApplyAuditRecursivelyOptimized(BaseEntity entity, bool isDelete = false, HashSet<object>? visited = null)
+    private void ApplyAuditRecursivelyOptimized(Aggregate entity, bool isDelete = false, HashSet<object>? visited = null)
     {
         if (entity == null) return;
 
@@ -405,8 +405,8 @@ public abstract class BaseRepository<TEntity> : IBaseRepository<TEntity> where T
         var navProps = _navigationPropertiesCache.GetOrAdd(entityType, type =>
             type.GetProperties()
                 .Where(p =>
-                    (typeof(IEnumerable<BaseEntity>).IsAssignableFrom(p.PropertyType) ||
-                     typeof(BaseEntity).IsAssignableFrom(p.PropertyType)) &&
+                    (typeof(IEnumerable<Aggregate>).IsAssignableFrom(p.PropertyType) ||
+                     typeof(Aggregate).IsAssignableFrom(p.PropertyType)) &&
                     p.GetValue(entity) != null)
                 .ToArray()
         );
@@ -419,12 +419,12 @@ public abstract class BaseRepository<TEntity> : IBaseRepository<TEntity> where T
                 case null:
                     continue;
 
-                case IEnumerable<BaseEntity> collection:
+                case IEnumerable<Aggregate> collection:
                     foreach (var item in collection)
                         ApplyAuditRecursivelyOptimized(item, isDelete, visited);
                     break;
 
-                case BaseEntity singleEntity:
+                case Aggregate singleEntity:
                     ApplyAuditRecursivelyOptimized(singleEntity, isDelete, visited);
                     break;
             }

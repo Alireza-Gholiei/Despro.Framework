@@ -2,7 +2,7 @@
 
 namespace Despro.Framework.Base.BaseModels;
 
-public abstract class AggregateRoot : BaseEntity
+public abstract class AggregateRoot : Aggregate
 {
     [NotMapped]
     public List<BaseDomainEvent> DomainEvents { get; } = [];

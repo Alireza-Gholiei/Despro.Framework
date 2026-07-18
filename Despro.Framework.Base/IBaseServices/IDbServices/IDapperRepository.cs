@@ -4,10 +4,10 @@ using System.Linq.Expressions;
 
 namespace Despro.Framework.Base.IBaseServices.IDbServices;
 
-public interface IDapperRepository<TEntity> where TEntity : BaseEntity
+public interface IDapperRepository<TEntity> where TEntity : Aggregate
 {
     Task<IEnumerable<TEntity>> GetAllAsync();
-    Task<IEnumerable<TEntity>> GetPagedAsync(int page, int pageSize, string orderBy = nameof(BaseEntity.Id));
+    Task<IEnumerable<TEntity>> GetPagedAsync(int page, int pageSize, string orderBy = nameof(Aggregate.Id));
     Task<TEntity?> GetByIdAsync(long id);
     Task<IEnumerable<TEntity>> FindAsync(Expression<Func<TEntity, bool>> predicate);
     Task<int> ExecuteRawQueryAsync(string sql, object? parameters = null);

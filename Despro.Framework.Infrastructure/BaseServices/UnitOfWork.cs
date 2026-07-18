@@ -48,9 +48,7 @@ public class UnitOfWork(EfBaseContext dbContext, IRepositoryServices repositoryS
         if (_transaction == null) return;
         try
         {
-            _context.SaveChanges();
             _transaction.Commit();
-            repositoryServices.LoggingContext.FlushLogs();
         }
         finally
         {
@@ -64,9 +62,7 @@ public class UnitOfWork(EfBaseContext dbContext, IRepositoryServices repositoryS
         if (_transaction == null) return;
         try
         {
-            await _context.SaveChangesAsync(token);
             await _transaction.CommitAsync(token);
-            await repositoryServices.LoggingContext.FlushLogsAsync();
         }
         finally
         {

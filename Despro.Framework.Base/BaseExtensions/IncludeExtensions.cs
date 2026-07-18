@@ -12,8 +12,8 @@ public static class IncludeExtensions
         this IQueryable<TEntity> query,
         Expression<Func<TEntity, TProperty>> navigationExpression,
         bool withoutDeleted = false)
-        where TEntity : BaseEntity
-        where TProperty : BaseEntity
+        where TEntity : Aggregate
+        where TProperty : Aggregate
     {
         return query.Include(navigationExpression);
     }
@@ -22,8 +22,8 @@ public static class IncludeExtensions
         this IQueryable<TEntity> query,
         Expression<Func<TEntity, IEnumerable<TProperty>>> navigationExpression,
         bool withoutDeleted = false)
-        where TEntity : BaseEntity
-        where TProperty : BaseEntity
+        where TEntity : Aggregate
+        where TProperty : Aggregate
     {
         if (withoutDeleted)
             return query.Include(navigationExpression);
@@ -41,8 +41,8 @@ public static class IncludeExtensions
         this IIncludableQueryable<TEntity, TPreviousProperty> query,
         Expression<Func<TPreviousProperty, TProperty>> navigationExpression,
         bool withoutDeleted = false)
-        where TEntity : BaseEntity
-        where TProperty : BaseEntity
+        where TEntity : Aggregate
+        where TProperty : Aggregate
     {
         return query.ThenInclude(navigationExpression);
     }
@@ -51,8 +51,8 @@ public static class IncludeExtensions
         this IIncludableQueryable<TEntity, IEnumerable<TPreviousProperty>> query,
         Expression<Func<TPreviousProperty, TProperty>> navigationExpression,
         bool withoutDeleted = false)
-        where TEntity : BaseEntity
-        where TProperty : BaseEntity
+        where TEntity : Aggregate
+        where TProperty : Aggregate
     {
         return query.ThenInclude(navigationExpression);
     }
@@ -61,8 +61,8 @@ public static class IncludeExtensions
         this IIncludableQueryable<TEntity, IEnumerable<TPreviousProperty>> query,
         Expression<Func<TPreviousProperty, IEnumerable<TProperty>>> navigationExpression,
         bool withoutDeleted = false)
-        where TEntity : BaseEntity
-        where TProperty : BaseEntity
+        where TEntity : Aggregate
+        where TProperty : Aggregate
     {
         if (withoutDeleted)
             return query.ThenInclude(navigationExpression);
@@ -78,8 +78,8 @@ public static class IncludeExtensions
         this IIncludableQueryable<TEntity, TPreviousProperty> query,
         Expression<Func<TPreviousProperty, IEnumerable<TProperty>>> navigationExpression,
         bool withoutDeleted = false)
-        where TEntity : BaseEntity
-        where TProperty : BaseEntity
+        where TEntity : Aggregate
+        where TProperty : Aggregate
     {
         if (withoutDeleted)
             return query.ThenInclude(navigationExpression);

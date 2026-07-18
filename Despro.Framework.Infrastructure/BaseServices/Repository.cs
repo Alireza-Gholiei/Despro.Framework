@@ -6,4 +6,4 @@ namespace Despro.Framework.Infrastructure.BaseServices;
 
 internal class Repository<TEntity>(EfBaseContext context, IRepositoryServices repositoryServices)
     : BaseRepository<TEntity>(context, repositoryServices)
-    where TEntity : BaseEntity;
+    where TEntity : Aggregate;

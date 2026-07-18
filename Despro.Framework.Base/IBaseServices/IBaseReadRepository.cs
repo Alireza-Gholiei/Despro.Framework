@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 
 namespace Despro.Framework.Base.IBaseServices;
 
-public interface IBaseReadRepository<TEntity> : IDisposable, IAsyncDisposable where TEntity : BaseEntity
+public interface IBaseReadRepository<TEntity> : IDisposable, IAsyncDisposable where TEntity : Aggregate
 {
     Task<bool> AnyAsync(Expression<Func<TEntity, bool>>? filter = null);
     Task<int> CountAsync(Expression<Func<TEntity, bool>>? filter = null);
@@ -18,6 +18,6 @@ public interface IBaseReadRepository<TEntity> : IDisposable, IAsyncDisposable wh
     int GetFilterCount(BaseGrid baseGrid, Expression<Func<TEntity, bool>>? filter = null);
     IQueryable<TEntity> Table();
     IQueryable<TEntity> TableWithDelete();
-    IQueryable<TNewEntity> Context<TNewEntity>() where TNewEntity : BaseEntity;
-    IQueryable<TNewEntity> ContextWithDelete<TNewEntity>() where TNewEntity : BaseEntity;
+    IQueryable<TNewEntity> Context<TNewEntity>() where TNewEntity : Aggregate;
+    IQueryable<TNewEntity> ContextWithDelete<TNewEntity>() where TNewEntity : Aggregate;
 }

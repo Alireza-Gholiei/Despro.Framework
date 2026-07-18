@@ -11,7 +11,7 @@ namespace Despro.Framework.Infrastructure.BaseServices.DbServices;
 
 public class DapperRepository<TEntity>(IDbConnection dbConnection, EfBaseContext context)
     : IDapperRepository<TEntity>
-    where TEntity : BaseEntity
+    where TEntity : Aggregate
 {
     private readonly string _tableName = context.Model.FindEntityType(typeof(TEntity))?.GetTableName()
                                          ?? throw new InvalidOperationException($"Table name for {typeof(TEntity).Name} not found.");
@@ -148,7 +148,7 @@ public class DapperRepository<TEntity>(IDbConnection dbConnection, EfBaseContext
         }
     }
 
-    public async Task<IEnumerable<TEntity>> GetPagedAsync(int page, int pageSize, string orderBy = nameof(BaseEntity.Id))
+    public async Task<IEnumerable<TEntity>> GetPagedAsync(int page, int pageSize, string orderBy = nameof(Aggregate.Id))
     {
         try
         {

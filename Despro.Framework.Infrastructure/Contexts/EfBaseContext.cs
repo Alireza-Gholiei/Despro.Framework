@@ -108,11 +108,11 @@ public abstract class EfBaseContext : DbContext
 
             foreach (var entityType in builder.Model.GetEntityTypes())
             {
-                if (!typeof(BaseEntity).IsAssignableFrom(entityType.ClrType)) continue;
+                if (!typeof(Aggregate).IsAssignableFrom(entityType.ClrType)) continue;
 
                 var parameter = Expression.Parameter(entityType.ClrType, "e");
 
-                var isDeleteProperty = Expression.Property(parameter, nameof(BaseEntity.IsDelete));
+                var isDeleteProperty = Expression.Property(parameter, nameof(Aggregate.IsDelete));
                 var notDeleted = Expression.Equal(isDeleteProperty, Expression.Constant(false));
 
                 var lambda = Expression.Lambda(notDeleted, parameter);
