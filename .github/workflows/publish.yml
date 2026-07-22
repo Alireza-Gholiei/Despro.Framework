@@ -1,3 +1,4 @@
+
 name: Publish Packages
 
 on:
@@ -9,8 +10,11 @@ on:
 
 jobs:
   publish:
+
     runs-on: ubuntu-latest
+
     steps:
+
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -20,16 +24,15 @@ jobs:
           dotnet-version: '10.0.x'
 
       - name: Restore
-        run: dotnet restore **/*.csproj
+        run: dotnet restore
 
       - name: Build
-        run: dotnet build **/*.csproj -c Release --no-restore
+        run: dotnet build -c Release --no-restore
 
       - name: Pack
-        run: dotnet pack **/*.csproj -c Release --no-build -o ./packages
+        run: dotnet pack -c Release --no-build -o ./packages
 
       - name: Publish NuGet
-        if: github.event_name != 'pull_request'
         run: |
           dotnet nuget push "packages/*.nupkg" \
             --skip-duplicate \
