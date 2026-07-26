@@ -1,0 +1,10 @@
+<Solution>
+  <Project Path="Despro.Framework.Application/Despro.Framework.Application.csproj" />
+  <Project Path="Despro.Framework.Base/Despro.Framework.Base.csproj" />
+  <Project Path="Despro.Framework.Domain/Despro.Framework.Domain.csproj" />
+  <Project Path="Despro.Framework.Infrastructure/Despro.Framework.Infrastructure.csproj" />
+  <Project Path="Despro.Framework.Presentation.Api/Despro.Framework.Presentation.Api.csproj" />
+  <Project Path="Despro.Framework.Presentation.MinimalApi/Despro.Framework.Presentation.MinimalApi.csproj" />
+  <Project Path="Despro.Framework.Presentation/Despro.Framework.Presentation.csproj" />
+  <Project Path="Despro.Framework.WebClient/Despro.Framework.WebClient.csproj" />
+</Solution>
