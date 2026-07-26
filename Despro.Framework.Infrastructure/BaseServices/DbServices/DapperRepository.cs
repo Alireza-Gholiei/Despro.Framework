@@ -2,7 +2,6 @@
 using Despro.Framework.Base.BaseModels;
 using Despro.Framework.Base.IBaseServices.IDbServices;
 using Despro.Framework.Infrastructure.Contexts;
-using Microsoft.EntityFrameworkCore;
 using System.Data;
 using System.Linq.Expressions;
 using System.Text;
@@ -13,8 +12,10 @@ public class DapperRepository<TEntity>(IDbConnection dbConnection, EfBaseContext
     : IDapperRepository<TEntity>
     where TEntity : Aggregate
 {
-    private readonly string _tableName = context.Model.FindEntityType(typeof(TEntity))?.GetTableName()
-                                         ?? throw new InvalidOperationException($"Table name for {typeof(TEntity).Name} not found.");
+    //private readonly string _tableName = context.Model.FindEntityType(typeof(TEntity))?.GetTableName()
+    //                                     ?? throw new InvalidOperationException($"Table name for {typeof(TEntity).Name} not found.");
+
+    private readonly string _tableName = "";
 
     private static string EscapeTableName(string tableName)
     {

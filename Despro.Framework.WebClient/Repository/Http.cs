@@ -18,42 +18,28 @@ public class Http(IAuthService authService, IHttpClientFactory httpClientFactory
 {
     public async Task<TOut> GetAsync<TOut>(string url, bool apiResult = true, bool isAuth = true, string token = "", bool isRole = true)
     {
-        try
+        Uri requestUri = new(url);
+        HttpRequestMessage requestMessage = new()
         {
-            Uri requestUri = new(url);
-            HttpRequestMessage requestMessage = new()
-            {
-                Method = HttpMethod.Get,
-                RequestUri = requestUri
-            };
+            Method = HttpMethod.Get,
+            RequestUri = requestUri
+        };
 
-            return await SendUriAsync<TOut>(requestMessage, apiResult, isAuth, token, isRole);
-        }
-        catch (Exception e)
-        {
-            throw e;
-        }
+        return await SendUriAsync<TOut>(requestMessage, apiResult, isAuth, token, isRole);
     }
 
     public async Task<TOut> PostAsync<TIn, TOut>(string url, TIn model, bool apiResult = true, bool isAuth = true, string token = "", bool isRole = true)
     {
-        try
+        Uri requestUri = new(url);
+        var payload = JsonConvert.SerializeObject(model);
+        StringContent httpContent = new(payload, Encoding.UTF8, MediaTypeNames.Application.Json);
+        HttpRequestMessage requestMessage = new()
         {
-            Uri requestUri = new(url);
-            var payload = JsonConvert.SerializeObject(model);
-            StringContent httpContent = new(payload, Encoding.UTF8, MediaTypeNames.Application.Json);
-            HttpRequestMessage requestMessage = new()
-            {
-                Method = HttpMethod.Post,
-                RequestUri = requestUri,
-                Content = httpContent
-            };
-            return await SendUriAsync<TOut>(requestMessage, apiResult, isAuth, token, isRole);
-        }
-        catch (Exception e)
-        {
-            throw e;
-        }
+            Method = HttpMethod.Post,
+            RequestUri = requestUri,
+            Content = httpContent
+        };
+        return await SendUriAsync<TOut>(requestMessage, apiResult, isAuth, token, isRole);
     }
 
     public async Task<TOut> PostFormAsync<TIn, TOut>(string url, TIn model, bool apiResult = true, bool isAuth = true, string token = "", bool isRole = true)
@@ -82,23 +68,16 @@ public class Http(IAuthService authService, IHttpClientFactory httpClientFactory
 
     public async Task<TOut> PutAsync<TIn, TOut>(string url, TIn model, bool apiResult = true, bool isAuth = true, string token = "", bool isRole = true)
     {
-        try
+        Uri requestUri = new(url);
+        var payload = JsonConvert.SerializeObject(model);
+        StringContent httpContent = new(payload, Encoding.UTF8, MediaTypeNames.Application.Json);
+        HttpRequestMessage requestMessage = new()
         {
-            Uri requestUri = new(url);
-            var payload = JsonConvert.SerializeObject(model);
-            StringContent httpContent = new(payload, Encoding.UTF8, MediaTypeNames.Application.Json);
-            HttpRequestMessage requestMessage = new()
-            {
-                Method = HttpMethod.Put,
-                RequestUri = requestUri,
-                Content = httpContent
-            };
-            return await SendUriAsync<TOut>(requestMessage, apiResult, isAuth, token, isRole);
-        }
-        catch (Exception e)
-        {
-            throw e;
-        }
+            Method = HttpMethod.Put,
+            RequestUri = requestUri,
+            Content = httpContent
+        };
+        return await SendUriAsync<TOut>(requestMessage, apiResult, isAuth, token, isRole);
     }
 
     public async Task<TOut> PutFormAsync<TIn, TOut>(string url, TIn model, bool apiResult = true, bool isAuth = true, string token = "", bool isRole = true)
@@ -165,118 +144,83 @@ public class Http(IAuthService authService, IHttpClientFactory httpClientFactory
 
     public async Task<TOut> DeleteAsync<TOut>(string url, bool apiResult = true, bool isAuth = true, string token = "", bool isRole = true)
     {
-        try
+        Uri requestUri = new(url);
+        HttpRequestMessage requestMessage = new()
         {
-            Uri requestUri = new(url);
-            HttpRequestMessage requestMessage = new()
-            {
-                Method = HttpMethod.Delete,
-                RequestUri = requestUri
-            };
+            Method = HttpMethod.Delete,
+            RequestUri = requestUri
+        };
 
-            return await SendUriAsync<TOut>(requestMessage, apiResult, isAuth, token, isRole);
-        }
-        catch (Exception e)
-        {
-            throw e;
-        }
+        return await SendUriAsync<TOut>(requestMessage, apiResult, isAuth, token, isRole);
     }
 
     public async Task<MemoryStream> GetFileAsync(string url, bool apiResult = true, bool isAuth = true, string token = "", bool isRole = true)
     {
-        try
+        Uri requestUri = new(url);
+        HttpRequestMessage requestMessage = new()
         {
-            Uri requestUri = new(url);
-            HttpRequestMessage requestMessage = new()
-            {
-                Method = HttpMethod.Get,
-                RequestUri = requestUri
-            };
+            Method = HttpMethod.Get,
+            RequestUri = requestUri
+        };
 
-            return await SendUriStreamAsync(requestMessage, apiResult, isAuth, token, isRole);
-        }
-        catch (Exception e)
-        {
-            throw e;
-        }
+        return await SendUriStreamAsync(requestMessage, apiResult, isAuth, token, isRole);
     }
 
     public async Task<TOut> UploadFile<TOut>(string url, IFormFile file, bool apiResult = true, bool isAuth = true, string token = "", bool isRole = true)
     {
-        try
+        MultipartFormDataContent httpContent = new();
+
+        StreamContent fileStreamContent = new(file.OpenReadStream());
+
+        httpContent.Add(fileStreamContent, Path.GetFileName(file.Name), file.Name);
+
+        Uri requestUri = new(url);
+        HttpRequestMessage requestMessage = new()
         {
-            MultipartFormDataContent httpContent = new();
+            Method = HttpMethod.Post,
+            RequestUri = requestUri,
+            Content = httpContent
+        };
 
-            StreamContent fileStreamContent = new(file.OpenReadStream());
-
-            httpContent.Add(fileStreamContent, Path.GetFileName(file.Name), file.Name);
-
-            Uri requestUri = new(url);
-            HttpRequestMessage requestMessage = new()
-            {
-                Method = HttpMethod.Post,
-                RequestUri = requestUri,
-                Content = httpContent
-            };
-
-            return await SendUriAsync<TOut>(requestMessage, apiResult, isAuth, token, isRole);
-        }
-        catch (Exception e)
-        {
-            throw e;
-        }
+        return await SendUriAsync<TOut>(requestMessage, apiResult, isAuth, token, isRole);
     }
 
     private async Task<TOut> SendUriAsync<TOut>(HttpRequestMessage requestMessage, bool apiResult = true, bool isAuth = true, string token = "", bool isRole = true)
     {
-        try
+        var client = CreateClient(isAuth, token, isRole);
+        var result = await client.SendAsync(requestMessage);
+        var response = await result.Content.ReadAsStringAsync();
+
+        //result.EnsureSuccessStatusCode();
+
+        if (apiResult)
         {
-            var client = CreateClient(isAuth, token, isRole);
-            var result = await client.SendAsync(requestMessage);
-            var response = await result.Content.ReadAsStringAsync();
-
-            //result.EnsureSuccessStatusCode();
-
-            if (apiResult)
-            {
-                var apiResultHttp = JsonConvert.DeserializeObject<ApiResultHttp<TOut>>(response);
-                return !apiResultHttp.IsSuccess
-                    ? throw new WebClientException(apiResultHttp.MetaData.Message)
-                    : apiResultHttp.Data;
-            }
-            else
-            {
-                var apiResultHttp = JsonConvert.DeserializeObject<TOut>(response);
-
-                return apiResultHttp;
-            }
+            var apiResultHttp = JsonConvert.DeserializeObject<ApiResultHttp<TOut>>(response);
+            return !apiResultHttp.IsSuccess
+                ? throw new WebClientException(apiResultHttp.MetaData.Message)
+                : apiResultHttp.Data;
         }
-        catch (Exception e)
+        else
         {
-            throw e;
+            var apiResultHttp = JsonConvert.DeserializeObject<TOut>(response);
+
+            return apiResultHttp;
         }
     }
 
     private async Task<MemoryStream> SendUriStreamAsync(HttpRequestMessage requestMessage, bool apiResult = true, bool isAuth = true, string token = "", bool isRole = true)
     {
-        try
-        {
-            using var client = CreateClient(isAuth, token, isRole);
+        using var client = CreateClient(isAuth, token, isRole);
 
-            var result = await client.SendAsync(requestMessage);
+        var result = await client.SendAsync(requestMessage);
 
-            var responseStream = await result.Content.ReadAsStreamAsync();
+        var responseStream = await result.Content.ReadAsStreamAsync();
 
-            var memoryStream = new MemoryStream();
-            await responseStream.CopyToAsync(memoryStream);
-            memoryStream.Position = 0;
+        var memoryStream = new MemoryStream();
+        await responseStream.CopyToAsync(memoryStream);
+        memoryStream.Position = 0;
 
-            return memoryStream;
-        }
-        catch (Exception e)
-        {
-            throw e;
-        }
+        return memoryStream;
     }
 
     private HttpClient CreateClient(bool isAuth = true, string token = "", bool isRole = true)

@@ -15,41 +15,34 @@ public class CommandValidationBehavior<TRequest, TResponse>(IEnumerable<IValidat
         RequestHandlerDelegate<TResponse> next,
         CancellationToken cancellationToken)
     {
-        try
+        if (!validators.Any())
+            return await next(cancellationToken);
+
+        var context = new ValidationContext<TRequest>(request);
+
+        //var validationResults = await Task.WhenAll(
+        //    validators.Select(v => v.ValidateAsync(context, cancellationToken))
+        //);
+        var validationResults = new List<ValidationResult>();
+        foreach (var validator in validators)
         {
-            if (!validators.Any())
-                return await next(cancellationToken);
-
-            var context = new ValidationContext<TRequest>(request);
-
-            //var validationResults = await Task.WhenAll(
-            //    validators.Select(v => v.ValidateAsync(context, cancellationToken))
-            //);
-            var validationResults = new List<ValidationResult>();
-            foreach (var validator in validators)
-            {
-                var result = await validator.ValidateAsync(context, cancellationToken);
-                validationResults.Add(result);
-            }
-
-            var failures = validationResults
-                .SelectMany(r => r.Errors)
-                .Where(f => f != null)
-                .ToList();
-
-            if (!failures.Any())
-                return await next(cancellationToken);
-
-            var sb = new StringBuilder();
-            foreach (var error in failures)
-                sb.AppendLine(error.ErrorMessage);
-
-            throw new InvalidCommandException(sb.ToString());
+            var result = await validator.ValidateAsync(context, cancellationToken);
+            validationResults.Add(result);
         }
-        catch (Exception)
-        {
-            throw;
-        }
+
+        var failures = validationResults
+            .SelectMany(r => r.Errors)
+            .Where(f => f != null)
+            .ToList();
+
+        if (!failures.Any())
+            return await next(cancellationToken);
+
+        var sb = new StringBuilder();
+        foreach (var error in failures)
+            sb.AppendLine(error.ErrorMessage);
+
+        throw new InvalidCommandException(sb.ToString());
     }
 }
 

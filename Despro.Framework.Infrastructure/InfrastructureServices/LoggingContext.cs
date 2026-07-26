@@ -20,59 +20,45 @@ public class LoggingContext(IAuthService authService, ILogService logService) : 
 
     public async Task FlushLogsAsync()
     {
-        try
-        {
-            if (_pendingLogs != null && !_pendingLogs.Any())
-                return;
+        if (_pendingLogs != null && !_pendingLogs.Any())
+            return;
 
-            foreach (var batch in _pendingLogs.Chunk(BatchSize))
+        foreach (var batch in _pendingLogs.Chunk(BatchSize))
+        {
+            var logEntries = batch.Select(log => new LogEntity
             {
-                var logEntries = batch.Select(log => new LogEntity
-                {
-                    EntityName = log.EntityName,
-                    LogType = log.Operation,
-                    UserId = log.UserId,
-                    ActionDate = DateTime.UtcNow,
-                    EntityData = ToBsonDocument(log.Data)
-                }).ToList();
+                EntityName = log.EntityName,
+                LogType = log.Operation,
+                UserId = log.UserId,
+                ActionDate = DateTime.UtcNow,
+                EntityData = ToBsonDocument(log.Data)
+            }).ToList();
 
-                await logService.InsertManyAsync(logEntries);
-            }
+            await logService.InsertManyAsync(logEntries);
+        }
 
-            _pendingLogs.Clear();
-        }
-        catch (Exception)
-        {
-            throw;
-        }
+        _pendingLogs.Clear();
     }
 
     public void FlushLogs()
     {
-        try
-        {
-            if (!_pendingLogs.Any()) return;
+        if (!_pendingLogs.Any()) return;
 
-            foreach (var batch in _pendingLogs.Chunk(BatchSize))
+        foreach (var batch in _pendingLogs.Chunk(BatchSize))
+        {
+            var logEntries = batch.Select(log => new LogEntity
             {
-                var logEntries = batch.Select(log => new LogEntity
-                {
-                    EntityName = log.EntityName,
-                    LogType = log.Operation,
-                    UserId = log.UserId,
-                    ActionDate = DateTime.UtcNow,
-                    EntityData = ToBsonDocument(log.Data)
-                }).ToList();
+                EntityName = log.EntityName,
+                LogType = log.Operation,
+                UserId = log.UserId,
+                ActionDate = DateTime.UtcNow,
+                EntityData = ToBsonDocument(log.Data)
+            }).ToList();
 
-                logService.InsertManyAsync(logEntries).GetAwaiter().GetResult();
-            }
+            logService.InsertManyAsync(logEntries).GetAwaiter().GetResult();
+        }
 
-            _pendingLogs.Clear();
-        }
-        catch (Exception)
-        {
-            throw;
-        }
+        _pendingLogs.Clear();
     }
 
     private readonly HashSet<object> _processed = [];

@@ -25,110 +25,69 @@ public abstract class EfBaseContext : DbContext
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
     {
-        try
-        {
-            var modifiedEntities = GetModifiedEntities();
+        var modifiedEntities = GetModifiedEntities();
 
-            await PublishEvents(modifiedEntities, cancellationToken);
+        await PublishEvents(modifiedEntities, cancellationToken);
 
-            return await base.SaveChangesAsync(cancellationToken);
-        }
-        catch (Exception)
-        {
-            throw;
-        }
+        return await base.SaveChangesAsync(cancellationToken);
     }
 
     private List<AggregateRoot> GetModifiedEntities()
     {
-        try
-        {
-            return ChangeTracker.Entries<AggregateRoot>()
-                .Where(x => x.State != EntityState.Detached)
-                .Select(c => c.Entity)
-                .Where(c => c.DomainEvents.Any())
-                .ToList();
-        }
-        catch (Exception)
-        {
-            throw;
-        }
+        return ChangeTracker.Entries<AggregateRoot>()
+            .Where(x => x.State != EntityState.Detached)
+            .Select(c => c.Entity)
+            .Where(c => c.DomainEvents.Any())
+            .ToList();
     }
 
     private async Task PublishEvents(List<AggregateRoot> modifiedEntities, CancellationToken cancellationToken)
     {
-        try
-        {
-            if (modifiedEntities?.Any() != true) return;
+        if (modifiedEntities?.Any() != true) return;
 
-            foreach (var entity in modifiedEntities)
+        foreach (var entity in modifiedEntities)
+        {
+            List<BaseDomainEvent> events = [.. entity.DomainEvents];
+
+            foreach (var domainEvent in events)
             {
-                List<BaseDomainEvent> events = [.. entity.DomainEvents];
-
-                foreach (var domainEvent in events)
-                {
-                    entity.DomainEvents.Remove(domainEvent);
-                    await _publisher.Publish(domainEvent, PublishStrategy.Async, cancellationToken);
-                }
+                entity.DomainEvents.Remove(domainEvent);
+                await _publisher.Publish(domainEvent, PublishStrategy.Async, cancellationToken);
             }
-        }
-        catch (Exception)
-        {
-            throw;
         }
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        try
-        {
-            base.OnConfiguring(optionsBuilder);
-        }
-        catch (Exception)
-        {
-            throw;
-        }
+        base.OnConfiguring(optionsBuilder);
     }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
-        try
+        base.OnModelCreating(builder);
+
+        foreach (var fk in builder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))
         {
-            base.OnModelCreating(builder);
-
-            foreach (var fk in builder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))
+            if (!fk.IsOwnership)
             {
-                if (!fk.IsOwnership)
-                {
-                    fk.DeleteBehavior = DeleteBehavior.Restrict;
-                }
+                fk.DeleteBehavior = DeleteBehavior.Restrict;
             }
-
-            builder.ApplyConfigurationsFromAssembly(_configurationsAssembly);
-
-            foreach (var entityType in builder.Model.GetEntityTypes())
-            {
-                if (!typeof(Aggregate).IsAssignableFrom(entityType.ClrType)) continue;
-
-                var parameter = Expression.Parameter(entityType.ClrType, "e");
-
-                var isDeleteProperty = Expression.Property(parameter, nameof(Aggregate.IsDelete));
-                var notDeleted = Expression.Equal(isDeleteProperty, Expression.Constant(false));
-
-                var lambda = Expression.Lambda(notDeleted, parameter);
-
-                builder.Entity(entityType.ClrType).HasQueryFilter(lambda);
-            }
-
-            foreach (var entityType in builder.Model.GetEntityTypes())
-            {
-                entityType.SetTableName(entityType.DisplayName());
-            }
-
         }
-        catch (Exception)
+
+        builder.ApplyConfigurationsFromAssembly(_configurationsAssembly);
+
+        foreach (var entityType in builder.Model.GetEntityTypes())
         {
-            throw;
+            if (!typeof(Aggregate).IsAssignableFrom(entityType.ClrType)) continue;
+
+            var parameter = Expression.Parameter(entityType.ClrType, "e");
+
+            var isDeleteProperty = Expression.Property(parameter, nameof(Aggregate.IsDelete));
+            var notDeleted = Expression.Equal(isDeleteProperty, Expression.Constant(false));
+
+            var lambda = Expression.Lambda(notDeleted, parameter);
+
+            builder.Entity(entityType.ClrType).HasQueryFilter(lambda);
         }
     }
 
