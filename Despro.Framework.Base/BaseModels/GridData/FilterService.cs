@@ -1,13 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace Despro.Framework.Base.BaseModels.GridData;
 
 public static class FilterService
 {
     #region Paging & Ordering
-
     extension<T>(IQueryable<T> query)
     {
         public IQueryable<T> PagingList(BaseGrid baseGrid, bool applyOrder = true)
@@ -57,21 +57,18 @@ public static class FilterService
             if (!applyOrder || string.IsNullOrWhiteSpace(baseGrid.OrderField))
                 return query;
 
-            var propInfo = GetPropertyRecursive(typeof(T), baseGrid.OrderField);
-            if (propInfo == null)
+            var orderExpression = BuildOrderExpression<T>(baseGrid.OrderField);
+
+            if (orderExpression == null)
                 return query;
 
-            var orderProperty = GetGetter<T, object>(propInfo);
             query = baseGrid.OrderType == OrderType.Ascending
-                ? query.OrderBy(orderProperty)
-                : query.OrderByDescending(orderProperty);
+                ? Queryable.OrderBy(query, (dynamic)orderExpression)
+                : Queryable.OrderByDescending(query, (dynamic)orderExpression);
 
             return query;
         }
     }
-
-
-
     #endregion
 
     #region Filter Translation
@@ -196,35 +193,99 @@ public static class FilterService
         var constant = Expression.Constant(dateValue);
         return Expression.Equal(prop, constant);
     }
-    #endregion
 
-    #region Helpers
-    private static Expression<Func<T, P>> GetGetter<T, P>(PropertyInfo propInfo)
+    private static LambdaExpression? BuildOrderExpression<T>(string orderField)
     {
-        var param = Expression.Parameter(typeof(T), "e");
-        var body = Expression.Property(param, propInfo);
-        var converted = Expression.Convert(body, typeof(object));
-        return Expression.Lambda<Func<T, P>>(converted, param);
-    }
+        var parameter = Expression.Parameter(typeof(T), "x");
 
-    private static PropertyInfo GetPropertyRecursive(Type type, string propertyPath)
-    {
-        var parts = propertyPath.Split('.');
-        var currentType = type;
-        PropertyInfo propInfo = null;
+        var aggregateRegex = new Regex(
+            @"^(?<collection>\w+)\.(?<method>Sum|Count|Max|Min|Average)\((?<lambda>.*)\)$",
+            RegexOptions.IgnoreCase);
 
-        foreach (var part in parts)
+        var match = aggregateRegex.Match(orderField);
+
+        if (match.Success)
         {
-            propInfo = currentType.GetProperty(part, BindingFlags.Instance | BindingFlags.Public | BindingFlags.IgnoreCase);
-            if (propInfo == null) return null;
+            var collectionName = match.Groups["collection"].Value;
+            var method = match.Groups["method"].Value;
 
-            currentType = propInfo.PropertyType;
-            if (typeof(System.Collections.IEnumerable).IsAssignableFrom(currentType) && currentType.IsGenericType)
-                currentType = currentType.GetGenericArguments()[0];
+            var collectionProp = typeof(T).GetProperty(collectionName,
+                BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
+
+            if (collectionProp == null)
+                return null;
+
+            var collectionExpr = Expression.Property(parameter, collectionProp);
+
+            var itemType = collectionProp.PropertyType.GetGenericArguments()[0];
+
+            MethodCallExpression call;
+
+            if (method.Equals("Count", StringComparison.OrdinalIgnoreCase))
+            {
+                var countMethod = typeof(Enumerable)
+                    .GetMethods()
+                    .First(x => x.Name == "Count"
+                             && x.GetParameters().Length == 1)
+                    .MakeGenericMethod(itemType);
+
+                call = Expression.Call(countMethod, collectionExpr);
+            }
+            else
+            {
+                var lambdaRegex = new Regex(
+                    @"\w+\s*=>\s*\w+\.(?<property>\w+)",
+                    RegexOptions.IgnoreCase);
+
+                var lambdaMatch = lambdaRegex.Match(match.Groups["lambda"].Value);
+
+                if (!lambdaMatch.Success)
+                    return null;
+
+                var propertyName = lambdaMatch.Groups["property"].Value;
+
+                var itemParam = Expression.Parameter(itemType, "i");
+                var itemProp = Expression.Property(itemParam, propertyName);
+
+                var selector = Expression.Lambda(itemProp, itemParam);
+
+                var linqMethod = typeof(Enumerable)
+                    .GetMethods()
+                    .Where(x => x.Name == method)
+                    .First(x =>
+                    {
+                        var p = x.GetParameters();
+                        return p.Length == 2;
+                    });
+
+                var genericMethod = linqMethod.MakeGenericMethod(itemType);
+
+                call = Expression.Call(
+                    genericMethod,
+                    collectionExpr,
+                    selector);
+            }
+
+            return Expression.Lambda(call, parameter);
         }
 
-        return propInfo;
-    }
+        Expression body = parameter;
+        var currentType = typeof(T);
 
+        foreach (var part in orderField.Split('.'))
+        {
+            var prop = currentType.GetProperty(
+                part,
+                BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
+
+            if (prop == null)
+                return null;
+
+            body = Expression.Property(body, prop);
+            currentType = prop.PropertyType;
+        }
+
+        return Expression.Lambda(body, parameter);
+    }
     #endregion
 }
