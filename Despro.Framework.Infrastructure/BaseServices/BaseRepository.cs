@@ -205,14 +205,24 @@ public abstract class BaseRepository<TEntity> : IBaseRepository<TEntity> where T
             : await _dbTable.CountAsync(filter);
     }
 
-    public async Task<TEntity> GetByIdAsync(long id, CancellationToken cancellationToken = default)
+    public async Task<TEntity> GetByIdAsync(long id, CancellationToken cancellationToken = default, params Expression<Func<TEntity, object>>[] includes)
     {
-        return await Table().FirstOrDefaultAsync(x => x.Id.Equals(id), cancellationToken);
+        var query = Table();
+
+        if (includes is not { Length: > 0 })
+            return await query.FirstOrDefaultAsync(t => t.Id.Equals(id), cancellationToken);
+
+        foreach (var include in includes)
+        {
+            query = query.Include(include);
+        }
+
+        return await query.FirstOrDefaultAsync(t => t.Id.Equals(id), cancellationToken);
     }
 
     public async Task<TEntity> GetTrackingAsync(long id, CancellationToken cancellationToken = default, params Expression<Func<TEntity, object>>[] includes)
     {
-        IQueryable<TEntity> query = _dbTable.AsTracking();
+        var query = _dbTable.AsTracking();
 
         if (includes is not { Length: > 0 })
             return await query.FirstOrDefaultAsync(t => t.Id.Equals(id), cancellationToken);

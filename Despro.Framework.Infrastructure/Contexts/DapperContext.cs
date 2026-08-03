@@ -1,6 +1,4 @@
-﻿using System.Data;
-
-namespace Despro.Framework.Infrastructure.Contexts;
+﻿namespace Despro.Framework.Infrastructure.Contexts;
 
 public class DapperContext(string connectionString)
 {

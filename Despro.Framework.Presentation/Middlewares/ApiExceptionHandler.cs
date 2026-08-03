@@ -4,7 +4,6 @@ using Despro.Framework.Presentation.ControllerTools;
 using Despro.Framework.Presentation.PresentationApiExtensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 
 namespace Despro.Framework.Presentation.Middlewares;

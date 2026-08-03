@@ -8,13 +8,11 @@ public interface IBaseReadRepository<TEntity> : IDisposable, IAsyncDisposable wh
 {
     Task<bool> AnyAsync(Expression<Func<TEntity, bool>>? filter = null);
     Task<int> CountAsync(Expression<Func<TEntity, bool>>? filter = null);
-    Task<TEntity> GetByIdAsync(long id, CancellationToken cancellationToken = new CancellationToken());
-
-    Task<TEntity> GetTrackingAsync(long id, CancellationToken cancellationToken = default,
-        params Expression<Func<TEntity, object>>[] includes);
-    Task<List<TEntity>> GetAllAsync(CancellationToken cancellationToken = new CancellationToken());
+    Task<TEntity> GetByIdAsync(long id, CancellationToken cancellationToken = default, params Expression<Func<TEntity, object>>[] includes);
+    Task<TEntity> GetTrackingAsync(long id, CancellationToken cancellationToken = default, params Expression<Func<TEntity, object>>[] includes);
+    Task<List<TEntity>> GetAllAsync(CancellationToken cancellationToken = default);
     IQueryable<TEntity> GetFilterPaging(BaseGrid baseGrid);
-    Task<GridData<TDto>> GetFilterPagingDtoAsync<TDto>(BaseGrid baseGrid, CancellationToken cancellationToken = new CancellationToken());
+    Task<GridData<TDto>> GetFilterPagingDtoAsync<TDto>(BaseGrid baseGrid, CancellationToken cancellationToken = default);
     int GetFilterCount(BaseGrid baseGrid, Expression<Func<TEntity, bool>>? filter = null);
     IQueryable<TEntity> Table();
     IQueryable<TEntity> TableWithDelete();

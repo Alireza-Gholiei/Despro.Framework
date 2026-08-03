@@ -1,8 +1,8 @@
 ﻿using Despro.Framework.Application.ApplicationExceptions;
 using FluentValidation;
+using FluentValidation.Results;
 using MediatR;
 using System.Text;
-using FluentValidation.Results;
 
 namespace Despro.Framework.Application.QueryCommandTools;
 
