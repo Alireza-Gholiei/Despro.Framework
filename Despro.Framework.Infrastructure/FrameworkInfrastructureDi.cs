@@ -35,7 +35,7 @@ public static class FrameworkInfrastructureDi
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IErrorLogger, ErrorLogger>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
-        services.AddSingleton<ICustomPublisher, CustomPublisher>();
+        services.AddScoped<ICustomPublisher, CustomPublisher>();
 
         if (MongoDbLog)
         {
