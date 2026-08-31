@@ -47,7 +47,7 @@ public abstract class EfBaseContext : DbContext
 
         foreach (var entity in modifiedEntities)
         {
-            List<BaseDomainEvent> events = [.. entity.DomainEvents];
+            List<IDomainEvent> events = [.. entity.DomainEvents];
 
             foreach (var domainEvent in events)
             {
