@@ -4,7 +4,7 @@ namespace Despro.Framework.Domain.ValueObjects.Auth;
 
 public class AuthPasswordOptions
 {
-    public const string ConfigName = "AuthPasswordOptions";
+    public const string ConfigName = "DesproConfig:AuthPasswordOptions";
 
     [Range(4, 128, ErrorMessage = "حداقل طول رمز عبور باید بین 4 تا 128 باشد.")]
     public int RequiredLength { get; set; } = 6;

@@ -8,6 +8,9 @@ public static class FrameworkDomainDi
 {
     public static IServiceCollection AddFrameworkDomain(this IServiceCollection services, IConfiguration configuration)
     {
+        var signInKeyStr = configuration.GetSection(AuthPasswordOptions.ConfigName).Value
+                           ?? throw new Exception($"JwtConfig not configured! Config Is: '{AuthPasswordOptions.ConfigName}'");
+
         services
             .AddOptions<AuthPasswordOptions>()
             .Bind(configuration.GetSection(AuthPasswordOptions.ConfigName))

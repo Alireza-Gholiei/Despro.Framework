@@ -39,10 +39,10 @@ public static class FrameworkInfrastructureDi
 
         if (MongoDbLog)
         {
-            services.Configure<MongoDbConfig>(configuration.GetSection("MongoDbConfig"));
+            var conn = configuration.GetSection("DesproConfig:MongoDbConfig:ConnectionString").Value
+                       ?? throw new Exception("MongoDb not configured! Config Is: 'DesproConfig:MongoDbConfig:ConnectionString'");
 
-            var conn = configuration.GetSection("MongoDbConfig:ConnectionString").Value
-                       ?? throw new Exception("MongoDb ConnectionString not configured!");
+            services.Configure<MongoDbConfig>(configuration.GetSection("DesproConfig:MongoDbConfig"));
 
             services.AddSingleton<IMongoClient>(new MongoClient(conn));
             services.AddScoped(sp => sp.GetRequiredService<IMongoClient>()

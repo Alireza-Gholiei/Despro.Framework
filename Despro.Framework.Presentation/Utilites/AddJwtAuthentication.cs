@@ -11,7 +11,16 @@ public static class JwtAuthenticationConfig
 {
     public static IServiceCollection AddJwtAuthentication(this IServiceCollection services, IConfiguration configuration)
     {
-        var key = Encoding.UTF8.GetBytes(configuration["JwtConfig:SignInKey"]);
+        var signInKeyStr = configuration.GetSection("DesproConfig:JwtConfig:SignInKey").Value
+                           ?? throw new Exception("JwtConfig not configured! Config Is: 'DesproConfig:JwtConfig:SignInKey'");
+
+        var validIssuerStr = configuration.GetSection("DesproConfig:JwtConfig:Issuer").Value
+                             ?? throw new Exception("JwtConfig not configured! Config Is: 'DesproConfig:JwtConfig:Issuer'");
+
+        var validAudienceStr = configuration.GetSection("DesproConfig:JwtConfig:Audience").Value
+                               ?? throw new Exception("JwtConfig not configured! Config Is: 'DesproConfig:JwtConfig:Audience'");
+
+        var key = Encoding.UTF8.GetBytes(signInKeyStr);
 
         services.AddAuthentication(options =>
         {
@@ -29,8 +38,8 @@ public static class JwtAuthenticationConfig
                 ValidateAudience = true,
                 ValidateLifetime = true,
                 ValidateIssuerSigningKey = true,
-                ValidIssuer = configuration["JwtConfig:Issuer"],
-                ValidAudience = configuration["JwtConfig:Audience"],
+                ValidIssuer = validIssuerStr,
+                ValidAudience = validAudienceStr,
                 IssuerSigningKey = new SymmetricSecurityKey(key),
                 ClockSkew = TimeSpan.Zero
             };

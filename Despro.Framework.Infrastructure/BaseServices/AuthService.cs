@@ -202,7 +202,16 @@ public class AuthService(
         if (string.IsNullOrEmpty(accessToken))
             return [];
 
-        SymmetricSecurityKey securityKey = new(Encoding.UTF8.GetBytes(configuration["JwtConfig:SignInKey"] ?? string.Empty));
+        var signInKeyStr = configuration.GetSection("DesproConfig:JwtConfig:SignInKey").Value
+                          ?? throw new Exception("JwtConfig not configured! Config Is: 'DesproConfig:JwtConfig:SignInKey'");
+
+        var validIssuerStr = configuration.GetSection("DesproConfig:JwtConfig:Issuer").Value
+                             ?? throw new Exception("JwtConfig not configured! Config Is: 'DesproConfig:JwtConfig:Issuer'");
+
+        var validAudienceStr = configuration.GetSection("DesproConfig:JwtConfig:Audience").Value
+                               ?? throw new Exception("JwtConfig not configured! Config Is: 'DesproConfig:JwtConfig:Audience'");
+
+        SymmetricSecurityKey securityKey = new(Encoding.UTF8.GetBytes(signInKeyStr));
         JwtSecurityTokenHandler tokenHandler = new();
 
         TokenValidationParameters validationParameters = new()
@@ -211,8 +220,8 @@ public class AuthService(
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            ValidIssuer = configuration["JwtConfig:Issuer"],
-            ValidAudience = configuration["JwtConfig:Audience"],
+            ValidIssuer = validIssuerStr,
+            ValidAudience = validAudienceStr,
             IssuerSigningKey = securityKey
         };
 

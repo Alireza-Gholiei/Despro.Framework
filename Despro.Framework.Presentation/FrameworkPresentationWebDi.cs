@@ -35,14 +35,16 @@ public static class FrameworkPresentationWebDi
         {
             options.AddPolicy(name: CorsPolicyName, builder =>
             {
-                var origins = configuration["App:CorsOrigins"]?
-                    .Split(",", StringSplitOptions.RemoveEmptyEntries)
+                var originsStr = configuration.GetSection("DesproConfig:CorsOrigins").Value
+                                 ?? throw new Exception("CorsOrigins not configured! Config Is: 'DesproConfig:CorsOrigins'");
+
+                var origins = originsStr?.Split(",", StringSplitOptions.RemoveEmptyEntries)
                     .Select(x => x.Trim())
                     .Where(x => !string.IsNullOrWhiteSpace(x))
                     .ToArray();
 
                 if (origins == null || origins.Length == 0)
-                    throw new Exception("CorsOrigins is not configured.");
+                    throw new Exception("CorsOrigins is not configured. Config Is: 'DesproConfig:CorsOrigins'");
 
                 builder.WithOrigins(origins)
                     .AllowAnyHeader()
