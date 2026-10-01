@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 
 namespace Despro.Framework.Base.IBaseServices;
 
-public interface IBaseReadRepository<TEntity, in TId> : IDisposable, IAsyncDisposable where TEntity : Aggregate<TId> where TId : notnull
+public interface IBaseReadRepository<TEntity, in TId> where TEntity : Aggregate<TId> where TId : notnull
 {
     Task<bool> AnyAsync(Expression<Func<TEntity, bool>>? filter = null);
     Task<int> CountAsync(Expression<Func<TEntity, bool>>? filter = null);

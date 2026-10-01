@@ -403,15 +403,15 @@ public abstract class BaseRepository<TEntity, TId> : IBaseRepository<TEntity, TI
         var navProps = _navigationPropertiesCache.GetOrAdd(entityType, type =>
             type.GetProperties()
                 .Where(p =>
-                    (typeof(IEnumerable<Aggregate<TId>>).IsAssignableFrom(p.PropertyType) ||
-                     typeof(Aggregate<TId>).IsAssignableFrom(p.PropertyType)) &&
-                    p.GetValue(entity) != null)
+                    typeof(IEnumerable<object>).IsAssignableFrom(p.PropertyType) ||
+                    (p.PropertyType.IsClass && p.PropertyType != typeof(string)))
                 .ToArray()
         );
 
         foreach (var prop in navProps)
         {
             var value = prop.GetValue(entity);
+            if (value is null) continue;
             switch (value)
             {
                 case null:
@@ -438,14 +438,4 @@ public abstract class BaseRepository<TEntity, TId> : IBaseRepository<TEntity, TI
     }
 
     #endregion
-
-    public void Dispose()
-    {
-        _context.Dispose();
-    }
-
-    public async ValueTask DisposeAsync()
-    {
-        await _context.DisposeAsync();
-    }
 }

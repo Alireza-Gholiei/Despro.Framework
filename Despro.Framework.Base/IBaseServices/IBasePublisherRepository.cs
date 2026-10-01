@@ -3,7 +3,7 @@ using System.Linq.Expressions;
 
 namespace Despro.Framework.Base.IBaseServices;
 
-public interface IBasePublisherRepository<TEntity, in TId> : IDisposable, IAsyncDisposable where TEntity : Aggregate<TId> where TId : notnull
+public interface IBasePublisherRepository<TEntity, in TId> where TEntity : Aggregate<TId> where TId : notnull
 {
     Task AddAsync(TEntity? entity, CancellationToken cancellationToken = new CancellationToken());
     Task UpdateAsync(TEntity? entity);
