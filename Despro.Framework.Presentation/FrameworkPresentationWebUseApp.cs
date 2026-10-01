@@ -60,15 +60,11 @@ public static class FrameworkPresentationWebUseApp
     {
         var versions = app.DescribeApiVersions();
 
-        foreach (var d in versions)
-            options.SwaggerEndpoint($"/swagger/{d.GroupName}/swagger.json", d.GroupName.ToUpperInvariant());
-
-        foreach (var m in app.Services.GetServices<ModuleEndpointRegistration>()
-                     .Select(r => r.Options).Where(o => o.SeparateSwaggerDoc))
-        foreach (var d in versions)
-            options.SwaggerEndpoint(
-                $"/swagger/{ModuleSwaggerNames.DocName(m.Name, d.GroupName)}/swagger.json",
-                $"{m.Name} {d.GroupName.ToUpperInvariant()}");
+        foreach (var module in app.Services.GetServices<IModuleRegistration>().SeparateDocModules())
+            foreach (var d in versions)
+                options.SwaggerEndpoint(
+                    $"/swagger/{ModuleSwaggerNames.DocName(module, d.GroupName)}/swagger.json",
+                    $"{module} {d.GroupName.ToUpperInvariant()}");
 
         options.DocExpansion(DocExpansion.None);
         options.DefaultModelsExpandDepth(-1);

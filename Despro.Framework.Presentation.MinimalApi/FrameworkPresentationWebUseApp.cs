@@ -11,8 +11,9 @@ public static class FrameworkPresentationWebUseApp
 {
     public static IApplicationBuilder UseFrameworkPresentationWebMinimalApi(this WebApplication app, IEnumerable<ApiVersion> apiVersions)
     {
-        var modules = app.Services.GetServices<ModuleEndpointRegistration>().Select(r => r.Options).ToList();
+        app.Services.GetServices<IModuleRegistration>().EnsureValid();
 
+        var modules = app.Services.GetServices<ModuleEndpointRegistration>().Select(r => r.Options).ToList();
         var duplicate = modules.GroupBy(m => m.Name, StringComparer.OrdinalIgnoreCase).FirstOrDefault(g => g.Count() > 1);
         if (duplicate is not null)
             throw new InvalidOperationException($"Module '{duplicate.Key}' registered endpoints more than once.");
@@ -40,7 +41,7 @@ public static class FrameworkPresentationWebUseApp
             }
         }
 
-        app.MapControllers();
+        app.MapControllersOnce();
         return app;
     }
 }

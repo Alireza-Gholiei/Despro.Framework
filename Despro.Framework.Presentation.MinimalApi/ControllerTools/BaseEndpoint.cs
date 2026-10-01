@@ -80,7 +80,7 @@ public abstract class BaseEndpoint : IEndpoint
             finalTag = className.Replace("Endpoints", "");
         }
 
-        var groupPath = Route ?? context.Resolve(finalTag);
+        var groupPath = Route is null ? context.Resolve(finalTag) : context.ResolveModuleToken(Route);
 
         var group = app.MapGroup(groupPath)
             .WithApiVersionSet(versionSet)
@@ -90,46 +90,6 @@ public abstract class BaseEndpoint : IEndpoint
 
         DefineEndpoints(group);
     }
-
-    //public void MapEndpoint(IEndpointRouteBuilder app, ApiVersionSet versionSet)
-    //{
-    //    string finalTag;
-    //    string groupPath;
-
-    //    if (!string.IsNullOrWhiteSpace(Tag))
-    //    {
-    //        finalTag = Tag;
-    //    }
-    //    else
-    //    {
-    //        var className = GetType().Name;
-    //        if (!className.EndsWith("Endpoints"))
-    //            throw new PresentationException($"Endpoint Class Name '{className}' Must End With 'Endpoints'");
-
-    //        finalTag = className.Replace("Endpoints", "");
-    //    }
-
-    //    if (!string.IsNullOrWhiteSpace(Route) || Route != null)
-    //    {
-    //        groupPath = Route;
-    //    }
-    //    else
-    //    {
-    //        var rootPrefix = FrameworkPresentationWebDi._routePrefix.Replace("/[controller]", "");
-    //        groupPath = FrameworkPresentationWebDi._routePrefix.Contains("/[controller]")
-    //            ? $"{rootPrefix}/{finalTag}"
-    //            : rootPrefix;
-    //    }
-
-    //    var group = app.MapGroup(groupPath)
-    //        .WithApiVersionSet(versionSet)
-    //        .HasApiVersion(Version)
-    //        .WithTags(finalTag);
-
-    //    DefineEndpoints(group);
-    //}
-
-
 
     protected abstract void DefineEndpoints(IEndpointRouteBuilder app);
 }

@@ -37,7 +37,8 @@ public static class SwaggerConfig
 
         services.AddSwaggerGen(options =>
         {
-            options.CustomSchemaIds(t => t.FullName!.Replace('+', '.'));
+            //options.CustomSchemaIds(t => t.FullName!.Replace('+', '.'));
+            options.CustomSchemaIds(SwaggerSchemaIds.Create);
             options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
                 In = ParameterLocation.Header,
@@ -52,18 +53,6 @@ public static class SwaggerConfig
                 [new OpenApiSecuritySchemeReference("Bearer", document)] = []
             });
 
-            //options.AddSecurityRequirement(new OpenApiSecurityRequirement {
-            //{
-            //    new OpenApiSecurityScheme
-            //    {
-            //        Reference = new OpenApiReference
-            //        {
-            //            Type = ReferenceType.SecurityScheme,
-            //            Id = "Bearer"
-            //        }
-            //    }, []
-            //}});
-
             options.AddSecurityDefinition("RoleId", new OpenApiSecurityScheme
             {
                 In = ParameterLocation.Header,
@@ -75,18 +64,6 @@ public static class SwaggerConfig
             {
                 [new OpenApiSecuritySchemeReference("RoleId", document)] = []
             });
-
-            //options.AddSecurityRequirement(new OpenApiSecurityRequirement {{
-            //    new OpenApiSecurityScheme
-            //    {
-            //        Reference = new OpenApiReference
-            //        {
-            //            Type = ReferenceType.SecurityScheme,
-            //            Id = "RoleId"
-            //        }
-            //    },
-            //    []
-            //}});
         });
 
         return services;

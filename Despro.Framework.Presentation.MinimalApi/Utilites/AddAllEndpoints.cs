@@ -14,7 +14,9 @@ public static class EndpointExtensions
             ArgumentException.ThrowIfNullOrWhiteSpace(options.Name);
             ArgumentNullException.ThrowIfNull(options.ApiAssembly);
 
-            services.AddSingleton(new ModuleEndpointRegistration(options));
+            var registration = new ModuleEndpointRegistration(options);
+            services.AddSingleton(registration);                       
+            services.AddSingleton<IModuleRegistration>(registration);  
             return services;
         }
 

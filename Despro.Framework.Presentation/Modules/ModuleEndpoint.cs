@@ -12,17 +12,16 @@ public sealed class ModuleEndpointOptions
     public bool SeparateSwaggerDoc { get; set; } = true;
 }
 
-public sealed record ModuleEndpointRegistration(ModuleEndpointOptions Options);
-
 public sealed record EndpointModuleMetadata(string ModuleName);
 
 public sealed record EndpointModuleContext(string ModuleName, string RoutePrefix)
 {
     public static readonly EndpointModuleContext Default = new("default", string.Empty);
 
-    public string Resolve(string tag) => RoutePrefix
-        .Replace("[module]", ModuleName.ToLowerInvariant())
-        .Replace("[controller]", tag);
+    public string ResolveModuleToken(string template) =>
+        template.Replace("[module]", ModuleName.ToLowerInvariant());
+
+    public string Resolve(string tag) => ResolveModuleToken(RoutePrefix).Replace("[controller]", tag);
 }
 
 public static class ModuleSwaggerNames
