@@ -14,17 +14,15 @@ using System.Reflection;
 
 namespace Despro.Framework.Infrastructure.BaseServices;
 
-public abstract class BaseRepository<TEntity> : IBaseRepository<TEntity> where TEntity : Aggregate
+public abstract class BaseRepository<TEntity, TId> : IBaseRepository<TEntity, TId> where TEntity : Aggregate<TId> where TId : notnull
 {
     private readonly EfBaseContext _context;
     private readonly DbSet<TEntity> _dbTable;
     private readonly ILoggingContext _loggingContext;
-    private readonly IAuthService _authService;
 
     protected BaseRepository(EfBaseContext context, IRepositoryServices repositoryServices)
     {
         _context = context;
-        _authService = repositoryServices.AuthService;
         _loggingContext = repositoryServices.LoggingContext;
 
         _dbTable = _context.Set<TEntity>();
@@ -88,7 +86,7 @@ public abstract class BaseRepository<TEntity> : IBaseRepository<TEntity> where T
     /// );
     /// </code>
     /// </example>
-    public async Task UpdatePartialAsync(long id, Action<TEntity> updateAction, params Expression<Func<TEntity, object>>[] updatedProperties)
+    public async Task UpdatePartialAsync(TId id, Action<TEntity> updateAction, params Expression<Func<TEntity, object>>[] updatedProperties)
     {
         try
         {
@@ -99,14 +97,13 @@ public abstract class BaseRepository<TEntity> : IBaseRepository<TEntity> where T
             updateAction(entity);
 
             ApplyAuditRecursivelyOptimized(entity);
-            //ApplyAuditRecursively(entity, e => e.SetUpdate(DateTime.Now.Ticks, _authService.GetUserId()));
 
             _context.ChangeTracker.DetectChanges();
 
             if (_context.Entry(entity).Metadata.FindProperty("RowVersion") != null)
             {
                 var dbValue = await _dbTable.AsNoTracking()
-                    .Where(e => e.Id == id)
+                    .Where(e => e.Id.Equals(id))
                     .Select(e => EF.Property<byte[]>(e, "RowVersion"))
                     .FirstOrDefaultAsync();
 
@@ -132,8 +129,7 @@ public abstract class BaseRepository<TEntity> : IBaseRepository<TEntity> where T
         }
     }
 
-
-    public async Task RemoveAsync(long id, CancellationToken cancellationToken = default)
+    public async Task RemoveAsync(TId id, CancellationToken cancellationToken = default)
     {
         var deletedItem = await GetByIdAsync(id, cancellationToken);
         if (deletedItem == null)
@@ -168,7 +164,7 @@ public abstract class BaseRepository<TEntity> : IBaseRepository<TEntity> where T
         return Task.CompletedTask;
     }
 
-    public async Task HardDeleteAsync(long id, CancellationToken cancellationToken = new CancellationToken())
+    public async Task HardDeleteAsync(TId id, CancellationToken cancellationToken = new CancellationToken())
     {
         var deletedItem = await GetByIdAsync(id, cancellationToken);
 
@@ -205,7 +201,7 @@ public abstract class BaseRepository<TEntity> : IBaseRepository<TEntity> where T
             : await _dbTable.CountAsync(filter);
     }
 
-    public async Task<TEntity> GetByIdAsync(long id, CancellationToken cancellationToken = default, params Expression<Func<TEntity, object>>[] includes)
+    public async Task<TEntity> GetByIdAsync(TId id, CancellationToken cancellationToken = default, params Expression<Func<TEntity, object>>[] includes)
     {
         var query = Table();
 
@@ -220,7 +216,7 @@ public abstract class BaseRepository<TEntity> : IBaseRepository<TEntity> where T
         return await query.FirstOrDefaultAsync(t => t.Id.Equals(id), cancellationToken);
     }
 
-    public async Task<TEntity> GetTrackingAsync(long id, CancellationToken cancellationToken = default, params Expression<Func<TEntity, object>>[] includes)
+    public async Task<TEntity> GetTrackingAsync(TId id, CancellationToken cancellationToken = default, params Expression<Func<TEntity, object>>[] includes)
     {
         var query = _dbTable.AsTracking();
 
@@ -291,12 +287,12 @@ public abstract class BaseRepository<TEntity> : IBaseRepository<TEntity> where T
         return _dbTable.IgnoreQueryFilters().AsNoTracking();
     }
 
-    public IQueryable<TNewEntity> Context<TNewEntity>() where TNewEntity : Aggregate
+    public IQueryable<TNewEntity> Context<TNewEntity, TId>() where TNewEntity : Aggregate<TId> where TId : notnull
     {
         return _context.Set<TNewEntity>().AsNoTracking();
     }
 
-    public IQueryable<TNewEntity> ContextWithDelete<TNewEntity>() where TNewEntity : Aggregate
+    public IQueryable<TNewEntity> ContextWithDelete<TNewEntity, TId>() where TNewEntity : Aggregate<TId> where TId : notnull
     {
         return _context.Set<TNewEntity>().IgnoreQueryFilters().AsNoTracking();
     }
@@ -389,7 +385,7 @@ public abstract class BaseRepository<TEntity> : IBaseRepository<TEntity> where T
 
     private static readonly ConcurrentDictionary<Type, PropertyInfo[]> _navigationPropertiesCache = new();
 
-    private void ApplyAuditRecursivelyOptimized(Aggregate entity, bool isDelete = false, HashSet<object>? visited = null)
+    private void ApplyAuditRecursivelyOptimized(Aggregate<TId> entity, bool isDelete = false, HashSet<object>? visited = null)
     {
         if (entity == null) return;
 
@@ -400,23 +396,15 @@ public abstract class BaseRepository<TEntity> : IBaseRepository<TEntity> where T
         var entry = _context.Entry(entity);
         if (isDelete)
         {
-            entity.SetDelete(DateTime.UtcNow.Ticks, _authService.GetUserId());
-        }
-        else if (entry.State == EntityState.Added || entry.State == EntityState.Detached && entity.Id == 0)
-        {
-            entity.SetCreate(DateTime.UtcNow.Ticks, _authService.GetUserId());
-        }
-        else
-        {
-            entity.SetUpdate(DateTime.UtcNow.Ticks, _authService.GetUserId());
+            entity.SetDelete();
         }
 
         var entityType = entity.GetType();
         var navProps = _navigationPropertiesCache.GetOrAdd(entityType, type =>
             type.GetProperties()
                 .Where(p =>
-                    (typeof(IEnumerable<Aggregate>).IsAssignableFrom(p.PropertyType) ||
-                     typeof(Aggregate).IsAssignableFrom(p.PropertyType)) &&
+                    (typeof(IEnumerable<Aggregate<TId>>).IsAssignableFrom(p.PropertyType) ||
+                     typeof(Aggregate<TId>).IsAssignableFrom(p.PropertyType)) &&
                     p.GetValue(entity) != null)
                 .ToArray()
         );
@@ -429,19 +417,19 @@ public abstract class BaseRepository<TEntity> : IBaseRepository<TEntity> where T
                 case null:
                     continue;
 
-                case IEnumerable<Aggregate> collection:
+                case IEnumerable<Aggregate<TId>> collection:
                     foreach (var item in collection)
                         ApplyAuditRecursivelyOptimized(item, isDelete, visited);
                     break;
 
-                case Aggregate singleEntity:
+                case Aggregate<TId> singleEntity:
                     ApplyAuditRecursivelyOptimized(singleEntity, isDelete, visited);
                     break;
             }
         }
     }
 
-    class ReferenceEqualityComparer : IEqualityComparer<object>
+    private class ReferenceEqualityComparer : IEqualityComparer<object>
     {
         public static readonly ReferenceEqualityComparer Instance = new();
 

@@ -8,9 +8,10 @@ using System.Text;
 
 namespace Despro.Framework.Infrastructure.BaseServices.DbServices;
 
-public class DapperRepository<TEntity>(IDbConnection dbConnection, EfBaseContext context)
-    : IDapperRepository<TEntity>
-    where TEntity : Aggregate
+public class DapperRepository<TEntity, TId>(IDbConnection dbConnection, EfBaseContext context)
+    : IDapperRepository<TEntity, TId>
+    where TEntity : Aggregate<TId>
+    where TId : notnull
 {
     //private readonly string _tableName = context.Model.FindEntityType(typeof(TEntity))?.GetTableName()
     //                                     ?? throw new InvalidOperationException($"Table name for {typeof(TEntity).Name} not found.");
@@ -149,7 +150,7 @@ public class DapperRepository<TEntity>(IDbConnection dbConnection, EfBaseContext
         }
     }
 
-    public async Task<IEnumerable<TEntity>> GetPagedAsync(int page, int pageSize, string orderBy = nameof(Aggregate.Id))
+    public async Task<IEnumerable<TEntity>> GetPagedAsync(int page, int pageSize, string orderBy = nameof(Aggregate<TId>.Id))
     {
         try
         {
@@ -170,7 +171,7 @@ public class DapperRepository<TEntity>(IDbConnection dbConnection, EfBaseContext
         }
     }
 
-    public async Task<TEntity?> GetByIdAsync(long id)
+    public async Task<TEntity?> GetByIdAsync(TId id)
     {
         try
         {

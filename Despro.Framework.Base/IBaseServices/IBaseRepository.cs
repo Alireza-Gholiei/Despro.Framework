@@ -2,5 +2,8 @@
 
 namespace Despro.Framework.Base.IBaseServices;
 
-public interface IBaseRepository<TEntity> : IBasePublisherRepository<TEntity>, IBaseReadRepository<TEntity>
-    where TEntity : Aggregate;
+public interface IBaseRepository<TEntity, in TId> :
+    IBasePublisherRepository<TEntity, TId>,
+    IBaseReadRepository<TEntity, TId>
+    where TEntity : Aggregate<TId>
+    where TId : notnull;

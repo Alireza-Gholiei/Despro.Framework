@@ -1,6 +1,6 @@
 ﻿using Despro.Framework.Base.BaseModels;
 using Despro.Framework.Base.BaseModels.GridData;
-using MediatR;
+using Despro.Framework.Base.IMediator;
 
 namespace Despro.Framework.Application.QueryCommandTools;
 

@@ -1,32 +1,26 @@
 ﻿using Despro.Framework.Application.QueryCommandTools;
+using Despro.Framework.Base.IMediator;
 using Despro.Framework.Base.Validator;
 using FluentValidation;
-using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Despro.Framework.Application;
 
 public static class FrameworkApplicationDi
 {
-    public static IServiceCollection AddFrameworkApplication(this IServiceCollection services)
+    extension(IServiceCollection services)
     {
-        services.AddScoped(typeof(IPipelineBehavior<,>), typeof(CommandValidationBehavior<,>));
-
-        #region MediatR
-        services.AddMediatR(cfg =>
+        public IServiceCollection AddFrameworkApplication()
         {
-            cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(CommandValidationBehavior<,>), ServiceLifetime.Scoped);
+            services.AddPipelineBehavior(typeof(CommandValidationBehavior<,>));
 
-            cfg.RegisterServicesFromAssembly(typeof(CommandValidationBehavior<,>).Assembly);
-        });
+            services.AddValidatorsFromAssembly(typeof(CommandValidationBehavior<,>).Assembly);
+            services.AddValidatorsFromAssembly(typeof(FileValidator).Assembly);
 
-        services.AddScoped(typeof(IPipelineBehavior<,>), typeof(CommandValidationBehavior<,>));
+            return services;
+        }
 
-        services.AddValidatorsFromAssembly(typeof(CommandValidationBehavior<,>).Assembly);
-        #endregion
-
-        services.AddValidatorsFromAssembly(typeof(FileValidator).Assembly);
-
-        return services;
+        private IServiceCollection AddPipelineBehavior(Type behaviorType)
+            => services.AddScoped(typeof(IPipelineBehavior<,>), behaviorType);
     }
 }

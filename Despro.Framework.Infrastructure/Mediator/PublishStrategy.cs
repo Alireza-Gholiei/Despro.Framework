@@ -1,4 +1,4 @@
-﻿namespace Despro.Framework.Infrastructure.MediatR;
+﻿namespace Despro.Framework.Infrastructure.Mediator;
 
 public enum PublishStrategy
 {

@@ -1,6 +1,6 @@
 ﻿namespace Despro.Framework.Base.BaseModels;
 
-public class SystemError : AggregateRoot
+public class SystemError : AggregateRoot<long>
 {
     public string UserId { get; set; } = string.Empty;
     public string UserFullName { get; set; } = string.Empty;

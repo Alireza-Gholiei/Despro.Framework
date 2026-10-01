@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿using Despro.Framework.Base.IMediator;
 
 namespace Despro.Framework.Base.BaseModels;
 

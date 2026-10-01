@@ -8,22 +8,33 @@ namespace Despro.Framework.Base.BaseExtensions;
 public static class IncludeExtensions
 {
     #region IncludeFiltered
-    public static IIncludableQueryable<TEntity, TProperty> IncludeFiltered<TEntity, TProperty>(
+    public static IIncludableQueryable<TEntity, TProperty> IncludeFiltered<TEntity, TProperty, TId>(
+        this IQueryable<TEntity> query,
+        Expression<Func<TEntity, TProperty>> navigationExpression)
+        where TEntity : Aggregate<TId>
+        where TProperty : Aggregate<TId>
+        where TId : notnull
+    {
+        return query.Include(navigationExpression);
+    }
+    public static IIncludableQueryable<TEntity, TProperty> IncludeFiltered<TEntity, TProperty, TId>(
         this IQueryable<TEntity> query,
         Expression<Func<TEntity, TProperty>> navigationExpression,
         bool withoutDeleted = false)
-        where TEntity : Aggregate
-        where TProperty : Aggregate
+        where TEntity : Aggregate<TId>
+        where TProperty : Aggregate<TId>
+        where TId : notnull
     {
         return query.Include(navigationExpression);
     }
 
-    public static IIncludableQueryable<TEntity, IEnumerable<TProperty>> IncludeFiltered<TEntity, TProperty>(
+    public static IIncludableQueryable<TEntity, IEnumerable<TProperty>> IncludeFiltered<TEntity, TProperty, TId>(
         this IQueryable<TEntity> query,
         Expression<Func<TEntity, IEnumerable<TProperty>>> navigationExpression,
         bool withoutDeleted = false)
-        where TEntity : Aggregate
-        where TProperty : Aggregate
+        where TEntity : Aggregate<TId>
+        where TProperty : Aggregate<TId>
+        where TId : notnull
     {
         if (withoutDeleted)
             return query.Include(navigationExpression);
@@ -37,32 +48,35 @@ public static class IncludeExtensions
     #endregion
 
     #region ThenIncludeFiltered
-    public static IIncludableQueryable<TEntity, TProperty> ThenIncludeFiltered<TEntity, TPreviousProperty, TProperty>(
+    public static IIncludableQueryable<TEntity, TProperty> ThenIncludeFiltered<TEntity, TPreviousProperty, TProperty, TId>(
         this IIncludableQueryable<TEntity, TPreviousProperty> query,
         Expression<Func<TPreviousProperty, TProperty>> navigationExpression,
         bool withoutDeleted = false)
-        where TEntity : Aggregate
-        where TProperty : Aggregate
+        where TEntity : Aggregate<TId>
+        where TProperty : Aggregate<TId>
+        where TId : notnull
     {
         return query.ThenInclude(navigationExpression);
     }
 
-    public static IIncludableQueryable<TEntity, TProperty> ThenIncludeFiltered<TEntity, TPreviousProperty, TProperty>(
+    public static IIncludableQueryable<TEntity, TProperty> ThenIncludeFiltered<TEntity, TPreviousProperty, TProperty, TId>(
         this IIncludableQueryable<TEntity, IEnumerable<TPreviousProperty>> query,
         Expression<Func<TPreviousProperty, TProperty>> navigationExpression,
         bool withoutDeleted = false)
-        where TEntity : Aggregate
-        where TProperty : Aggregate
+        where TEntity : Aggregate<TId>
+        where TProperty : Aggregate<TId>
+        where TId : notnull
     {
         return query.ThenInclude(navigationExpression);
     }
 
-    public static IIncludableQueryable<TEntity, IEnumerable<TProperty>> ThenIncludeFiltered<TEntity, TPreviousProperty, TProperty>(
+    public static IIncludableQueryable<TEntity, IEnumerable<TProperty>> ThenIncludeFiltered<TEntity, TPreviousProperty, TProperty, TId>(
         this IIncludableQueryable<TEntity, IEnumerable<TPreviousProperty>> query,
         Expression<Func<TPreviousProperty, IEnumerable<TProperty>>> navigationExpression,
         bool withoutDeleted = false)
-        where TEntity : Aggregate
-        where TProperty : Aggregate
+        where TEntity : Aggregate<TId>
+        where TProperty : Aggregate<TId>
+        where TId : notnull
     {
         if (withoutDeleted)
             return query.ThenInclude(navigationExpression);
@@ -74,12 +88,13 @@ public static class IncludeExtensions
         return query.ThenInclude(filterLambda);
     }
 
-    public static IIncludableQueryable<TEntity, IEnumerable<TProperty>> ThenIncludeFiltered<TEntity, TPreviousProperty, TProperty>(
+    public static IIncludableQueryable<TEntity, IEnumerable<TProperty>> ThenIncludeFiltered<TEntity, TPreviousProperty, TProperty, TId>(
         this IIncludableQueryable<TEntity, TPreviousProperty> query,
         Expression<Func<TPreviousProperty, IEnumerable<TProperty>>> navigationExpression,
         bool withoutDeleted = false)
-        where TEntity : Aggregate
-        where TProperty : Aggregate
+        where TEntity : Aggregate<TId>
+        where TProperty : Aggregate<TId>
+        where TId : notnull
     {
         if (withoutDeleted)
             return query.ThenInclude(navigationExpression);

@@ -1,5 +1,5 @@
 ﻿using Despro.Framework.Base.BaseModels;
-using MediatR;
+using Despro.Framework.Base.IMediator;
 
 namespace Despro.Framework.Application.QueryCommandTools;
 

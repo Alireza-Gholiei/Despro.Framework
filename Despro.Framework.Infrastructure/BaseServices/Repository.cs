@@ -4,6 +4,7 @@ using Despro.Framework.Infrastructure.Contexts;
 
 namespace Despro.Framework.Infrastructure.BaseServices;
 
-internal class Repository<TEntity>(EfBaseContext context, IRepositoryServices repositoryServices)
-    : BaseRepository<TEntity>(context, repositoryServices)
-    where TEntity : Aggregate;
+internal class Repository<TEntity, TId>(EfBaseContext context, IRepositoryServices repositoryServices)
+    : BaseRepository<TEntity, TId>(context, repositoryServices)
+    where TEntity : Aggregate<TId>
+    where TId : notnull;

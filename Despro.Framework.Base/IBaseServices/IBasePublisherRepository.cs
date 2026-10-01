@@ -3,7 +3,7 @@ using System.Linq.Expressions;
 
 namespace Despro.Framework.Base.IBaseServices;
 
-public interface IBasePublisherRepository<TEntity> : IDisposable, IAsyncDisposable where TEntity : Aggregate
+public interface IBasePublisherRepository<TEntity, in TId> : IDisposable, IAsyncDisposable where TEntity : Aggregate<TId> where TId : notnull
 {
     Task AddAsync(TEntity? entity, CancellationToken cancellationToken = new CancellationToken());
     Task UpdateAsync(TEntity? entity);
@@ -29,10 +29,10 @@ public interface IBasePublisherRepository<TEntity> : IDisposable, IAsyncDisposab
     /// );
     /// </code>
     /// </example>
-    Task UpdatePartialAsync(long id, Action<TEntity> updateAction, params Expression<Func<TEntity, object>>[] updatedProperties);
-    Task RemoveAsync(long id, CancellationToken cancellationToken = new CancellationToken());
+    Task UpdatePartialAsync(TId id, Action<TEntity> updateAction, params Expression<Func<TEntity, object>>[] updatedProperties);
+    Task RemoveAsync(TId id, CancellationToken cancellationToken = new CancellationToken());
     Task RemoveAsync(TEntity? entity, CancellationToken cancellationToken = new CancellationToken());
     Task RemoveTrackingAsync(TEntity? entity, CancellationToken cancellationToken = new CancellationToken());
-    Task HardDeleteAsync(long id, CancellationToken cancellationToken = new CancellationToken());
+    Task HardDeleteAsync(TId id, CancellationToken cancellationToken = new CancellationToken());
     Task HardDeleteAsync(TEntity? entity, CancellationToken cancellationToken = new CancellationToken());
 }

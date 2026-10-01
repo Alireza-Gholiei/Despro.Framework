@@ -10,7 +10,7 @@
 		<PackageTags>Despro Framework Application</PackageTags>
 		<Description>Application Framework For Despro</Description>
 
-		<Version>2.0.8</Version>
+		<Version>2.0.9</Version>
 
 		<Authors>Despro Team</Authors>
 
@@ -38,10 +38,6 @@
 
 	<ItemGroup>
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<PackageReference Include="MediatR" Version="14.2.0" />
 	</ItemGroup>
 
 	<ItemGroup>

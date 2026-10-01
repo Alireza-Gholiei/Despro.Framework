@@ -38,7 +38,6 @@ public class ErrorLogger(
             {
                 var userId = authService.GetUserId();
                 errorObject.UserId = userId;
-                systemError.SetCreate(dateTime.Ticks, userId);
             }
             catch
             {
