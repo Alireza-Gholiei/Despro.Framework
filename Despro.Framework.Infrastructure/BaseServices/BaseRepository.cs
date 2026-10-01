@@ -14,13 +14,16 @@ using System.Reflection;
 
 namespace Despro.Framework.Infrastructure.BaseServices;
 
-public abstract class BaseRepository<TEntity, TId> : IBaseRepository<TEntity, TId> where TEntity : Aggregate<TId> where TId : notnull
+public abstract class BaseRepository<TContext, TEntity, TId> : IBaseRepository<TEntity, TId>
+    where TContext : EfBaseContext
+    where TEntity : Aggregate<TId>
+    where TId : notnull
 {
-    private readonly EfBaseContext _context;
+    private readonly TContext _context;
     private readonly DbSet<TEntity> _dbTable;
     private readonly ILoggingContext _loggingContext;
 
-    protected BaseRepository(EfBaseContext context, IRepositoryServices repositoryServices)
+    protected BaseRepository(TContext context, IRepositoryServices repositoryServices)
     {
         _context = context;
         _loggingContext = repositoryServices.LoggingContext;

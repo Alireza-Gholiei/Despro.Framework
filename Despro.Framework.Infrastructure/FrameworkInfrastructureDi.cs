@@ -36,7 +36,7 @@ public static class FrameworkInfrastructureDi
             services.AddHttpContextAccessor();
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IErrorLogger, ErrorLogger>();
-            services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped(typeof(IUnitOfWork<>), typeof(UnitOfWork<>));
             services.AddScoped<ICustomPublisher, CustomPublisher>();
 
             if (MongoDbLog)
@@ -69,7 +69,7 @@ public static class FrameworkInfrastructureDi
             services.AddValidatorsFromAssembly(queryAssembly);
             #endregion
 
-            services.AddScoped(typeof(IBaseRepository<,>), typeof(Repository<,>));
+            services.AddScoped(typeof(IBaseRepository<,>), typeof(Repository<,,>));
 
             services.AddScoped<IRepositoryServices, RepositoryServices>();
 

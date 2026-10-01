@@ -8,9 +8,10 @@ using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Despro.Framework.Infrastructure.BaseServices;
 
-public class UnitOfWork(EfBaseContext dbContext, IRepositoryServices repositoryServices) : IUnitOfWork
+public class UnitOfWork<TContext>(TContext dbContext, IRepositoryServices repositoryServices)
+    : IUnitOfWork<TContext> where TContext : EfBaseContext
 {
-    private readonly EfBaseContext _context = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+    private readonly TContext _context = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
 
     private IDbContextTransaction? _transaction;
     private bool _disposed;
@@ -45,28 +46,32 @@ public class UnitOfWork(EfBaseContext dbContext, IRepositoryServices repositoryS
 
     public void CommitTransaction()
     {
-        if (_transaction == null) return;
+        var tx = _transaction ?? _context.Database.CurrentTransaction;
+        if (tx == null) return;
+
         try
         {
-            _transaction.Commit();
+            tx.Commit();
         }
         finally
         {
-            _transaction.Dispose();
+            tx.Dispose();
             _transaction = null;
         }
     }
 
     public async Task CommitTransactionAsync(CancellationToken token = default)
     {
-        if (_transaction == null) return;
+        var tx = _transaction ?? _context.Database.CurrentTransaction;
+        if (tx == null) return;
+
         try
         {
-            await _transaction.CommitAsync(token);
+            await tx.CommitAsync(token);
         }
         finally
         {
-            await _transaction.DisposeAsync();
+            await tx.DisposeAsync();
             _transaction = null;
         }
     }
@@ -109,7 +114,7 @@ public class UnitOfWork(EfBaseContext dbContext, IRepositoryServices repositoryS
         catch (Exception ex)
         {
             await transaction.RollbackAsync(token);
-            throw new Exception("Can't Execute Transaction", ex);
+            throw;
         }
     }
 
@@ -126,7 +131,7 @@ public class UnitOfWork(EfBaseContext dbContext, IRepositoryServices repositoryS
         catch (Exception ex)
         {
             await transaction.RollbackAsync(token);
-            throw new Exception("Can't Execute Transaction", ex);
+            throw;
         }
     }
 
@@ -151,7 +156,7 @@ public class UnitOfWork(EfBaseContext dbContext, IRepositoryServices repositoryS
         catch (Exception ex)
         {
             await transaction.RollbackAsync(token);
-            throw new Exception("Can't Execute Transaction", ex);
+            throw;
         }
     }
 
@@ -166,7 +171,6 @@ public class UnitOfWork(EfBaseContext dbContext, IRepositoryServices repositoryS
 
         _transaction?.Dispose();
 
-        _context.Dispose();
         _disposed = true;
     }
 
@@ -177,7 +181,6 @@ public class UnitOfWork(EfBaseContext dbContext, IRepositoryServices repositoryS
         if (_transaction != null)
             await _transaction.DisposeAsync();
 
-        await _context.DisposeAsync();
         _disposed = true;
     }
 }

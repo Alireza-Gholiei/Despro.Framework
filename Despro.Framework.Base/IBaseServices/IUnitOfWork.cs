@@ -1,6 +1,6 @@
 ﻿namespace Despro.Framework.Base.IBaseServices;
 
-public interface IUnitOfWork : IDisposable, IAsyncDisposable
+public interface IUnitOfWork<TContext> : IDisposable, IAsyncDisposable
 {
     int SaveChanges();
     Task<int> SaveChangesAsync(CancellationToken token = new CancellationToken());
