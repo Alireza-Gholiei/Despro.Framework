@@ -7,7 +7,7 @@ public sealed class ModuleEndpointOptions
 {
     public string Name { get; set; } = default!;
     public Assembly ApiAssembly { get; set; } = default!;
-    public string RoutePrefix { get; set; } = "api/v{version:apiVersion}/[module]/[controller]";
+    public string RoutePrefix { get; set; } = "api/[module]/v{version:apiVersion}/[controller]";
     public IReadOnlyList<ApiVersion>? Versions { get; set; }
     public bool SeparateSwaggerDoc { get; set; } = true;
 }
