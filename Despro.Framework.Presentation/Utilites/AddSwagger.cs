@@ -1,6 +1,7 @@
 ﻿using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -32,8 +33,11 @@ public static class SwaggerConfig
             return new ConfigureSwaggerOptions(provider, applicationName);
         });
 
+        services.TryAddEnumerable(ServiceDescriptor.Singleton<IConfigureOptions<SwaggerGenOptions>, ConfigureModuleSwaggerOptions>());
+
         services.AddSwaggerGen(options =>
         {
+            options.CustomSchemaIds(t => t.FullName!.Replace('+', '.'));
             options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
                 In = ParameterLocation.Header,

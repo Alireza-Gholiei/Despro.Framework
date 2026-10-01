@@ -6,32 +6,23 @@ namespace Despro.Framework.Presentation.MinimalApi;
 
 public static class FrameworkPresentationWebDi
 {
-    public static string _routePrefix = string.Empty;
     /// <summary>
     /// AddFrameworkPresentationWebApi
     /// </summary>
-    /// <param name="services"></param>
     /// <param name="RoutePrefix">v{version:apiVersion}/[controller]</param>
+    /// <param name="services"></param>
     /// <returns></returns>
     /// <exception cref="Exception"></exception>
-    public static IServiceCollection AddFrameworkPresentationWebMinimalApi(this IServiceCollection services,
-        Assembly ApiAssembly,
-        string RoutePrefix)
+    public static IServiceCollection AddFrameworkPresentationWebMinimalApi(this IServiceCollection services, Assembly ApiAssembly, string RoutePrefix)
     {
-        _routePrefix = RoutePrefix;
-
-        services.AddAllEndpoints(ApiAssembly);
-
-        services.Configure<Microsoft.AspNetCore.Mvc.JsonOptions>(options =>
+        services.AddDesproModuleEndpoints(o =>
         {
-            options.JsonSerializerOptions.PropertyNamingPolicy = null;
+            o.Name = "default";
+            o.ApiAssembly = ApiAssembly;
+            o.RoutePrefix = RoutePrefix;
+            o.SeparateSwaggerDoc = false;
         });
 
-        services.ConfigureHttpJsonOptions(options =>
-        {
-            options.SerializerOptions.PropertyNamingPolicy = null;
-        });
-
-        return services;
+        return services.AddFrameworkPresentationWebMinimalApiJson();
     }
 }

@@ -1,8 +1,11 @@
 ﻿using Despro.Framework.Presentation.Middlewares;
+using Despro.Framework.Presentation.Modules;
 using Despro.Framework.Presentation.Utilites;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Swashbuckle.AspNetCore.SwaggerUI;
 
 namespace Despro.Framework.Presentation;
 
@@ -22,30 +25,7 @@ public static class FrameworkPresentationWebUseApp
         if (app.Environment.IsDevelopment())
         {
             app.UseSwagger();
-            app.UseSwaggerUI(options =>
-            {
-                var descriptions = app.DescribeApiVersions();
-
-                foreach (var description in descriptions)
-                {
-                    var url = $"/swagger/{description.GroupName}/swagger.json";
-                    var name = description.GroupName.ToUpperInvariant();
-                    options.SwaggerEndpoint(url, name);
-                }
-
-                options.DocExpansion(Swashbuckle.AspNetCore.SwaggerUI.DocExpansion.None);
-                options.DefaultModelsExpandDepth(-1);
-                options.DisplayRequestDuration();
-                options.ShowExtensions();
-
-                options.EnableFilter();
-                options.ShowCommonExtensions();
-                options.EnableDeepLinking();
-
-                options.ConfigObject.PersistAuthorization = true;
-                options.EnablePersistAuthorization();
-            });
-
+            app.UseSwaggerUI(o => ConfigureSwaggerUi(o, app));
             app.UseDeveloperExceptionPage();
             app.UseHsts();
             app.UseHttpsRedirection();
@@ -56,31 +36,8 @@ public static class FrameworkPresentationWebUseApp
             if (ShowSwaggerInProduction)
             {
                 app.UseSwagger();
-                app.UseSwaggerUI(options =>
-                {
-                    var descriptions = app.DescribeApiVersions();
-
-                    foreach (var description in descriptions)
-                    {
-                        var url = $"/swagger/{description.GroupName}/swagger.json";
-                        var name = description.GroupName.ToUpperInvariant();
-                        options.SwaggerEndpoint(url, name);
-                    }
-
-                    options.DocExpansion(Swashbuckle.AspNetCore.SwaggerUI.DocExpansion.None);
-                    options.DefaultModelsExpandDepth(-1);
-                    options.DisplayRequestDuration();
-                    options.ShowExtensions();
-
-                    options.EnableFilter();
-                    options.ShowCommonExtensions();
-                    options.EnableDeepLinking();
-
-                    options.ConfigObject.PersistAuthorization = true;
-                    options.EnablePersistAuthorization();
-                });
+                app.UseSwaggerUI(o => ConfigureSwaggerUi(o, app));
             }
-
             app.UseHsts();
             app.UseHttpsRedirection();
         }
@@ -97,5 +54,30 @@ public static class FrameworkPresentationWebUseApp
         app.UseApiExceptionHandler();
 
         return app;
+    }
+
+    private static void ConfigureSwaggerUi(SwaggerUIOptions options, WebApplication app)
+    {
+        var versions = app.DescribeApiVersions();
+
+        foreach (var d in versions)
+            options.SwaggerEndpoint($"/swagger/{d.GroupName}/swagger.json", d.GroupName.ToUpperInvariant());
+
+        foreach (var m in app.Services.GetServices<ModuleEndpointRegistration>()
+                     .Select(r => r.Options).Where(o => o.SeparateSwaggerDoc))
+        foreach (var d in versions)
+            options.SwaggerEndpoint(
+                $"/swagger/{ModuleSwaggerNames.DocName(m.Name, d.GroupName)}/swagger.json",
+                $"{m.Name} {d.GroupName.ToUpperInvariant()}");
+
+        options.DocExpansion(DocExpansion.None);
+        options.DefaultModelsExpandDepth(-1);
+        options.DisplayRequestDuration();
+        options.ShowExtensions();
+        options.EnableFilter();
+        options.ShowCommonExtensions();
+        options.EnableDeepLinking();
+        options.ConfigObject.PersistAuthorization = true;
+        options.EnablePersistAuthorization();
     }
 }

@@ -2,6 +2,7 @@
 using Despro.Framework.Base.BaseModels;
 using Despro.Framework.Presentation.ControllerTools;
 using Despro.Framework.Presentation.MinimalApi.PresentationExceptions;
+using Despro.Framework.Presentation.Modules;
 using Despro.Framework.Presentation.PresentationApiExtensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -63,44 +64,71 @@ public abstract class BaseEndpoint : IEndpoint
     public virtual string? GroupName => null;
     public virtual double Version => 1.0;
 
+    [Obsolete("Use the overload with EndpointModuleContext. Prefix is not available here.")]
     public void MapEndpoint(IEndpointRouteBuilder app, ApiVersionSet versionSet)
+        => MapEndpoint(app, versionSet, EndpointModuleContext.Default);
+
+    public void MapEndpoint(IEndpointRouteBuilder app, ApiVersionSet versionSet, EndpointModuleContext context)
     {
         string finalTag;
-        string groupPath;
-
-        if (!string.IsNullOrWhiteSpace(Tag))
-        {
-            finalTag = Tag;
-        }
+        if (!string.IsNullOrWhiteSpace(Tag)) finalTag = Tag;
         else
         {
             var className = GetType().Name;
             if (!className.EndsWith("Endpoints"))
                 throw new PresentationException($"Endpoint Class Name '{className}' Must End With 'Endpoints'");
-
             finalTag = className.Replace("Endpoints", "");
         }
 
-        if (!string.IsNullOrWhiteSpace(Route) || Route != null)
-        {
-            groupPath = Route;
-        }
-        else
-        {
-            var rootPrefix = FrameworkPresentationWebDi._routePrefix.Replace("/[controller]", "");
-            groupPath = FrameworkPresentationWebDi._routePrefix.Contains("/[controller]")
-                ? $"{rootPrefix}/{finalTag}"
-                : rootPrefix;
-        }
+        var groupPath = Route ?? context.Resolve(finalTag);
 
         var group = app.MapGroup(groupPath)
             .WithApiVersionSet(versionSet)
             .HasApiVersion(Version)
             .WithTags(finalTag)
-            .WithOpenApi();
+            .WithMetadata(new EndpointModuleMetadata(context.ModuleName));
 
         DefineEndpoints(group);
     }
+
+    //public void MapEndpoint(IEndpointRouteBuilder app, ApiVersionSet versionSet)
+    //{
+    //    string finalTag;
+    //    string groupPath;
+
+    //    if (!string.IsNullOrWhiteSpace(Tag))
+    //    {
+    //        finalTag = Tag;
+    //    }
+    //    else
+    //    {
+    //        var className = GetType().Name;
+    //        if (!className.EndsWith("Endpoints"))
+    //            throw new PresentationException($"Endpoint Class Name '{className}' Must End With 'Endpoints'");
+
+    //        finalTag = className.Replace("Endpoints", "");
+    //    }
+
+    //    if (!string.IsNullOrWhiteSpace(Route) || Route != null)
+    //    {
+    //        groupPath = Route;
+    //    }
+    //    else
+    //    {
+    //        var rootPrefix = FrameworkPresentationWebDi._routePrefix.Replace("/[controller]", "");
+    //        groupPath = FrameworkPresentationWebDi._routePrefix.Contains("/[controller]")
+    //            ? $"{rootPrefix}/{finalTag}"
+    //            : rootPrefix;
+    //    }
+
+    //    var group = app.MapGroup(groupPath)
+    //        .WithApiVersionSet(versionSet)
+    //        .HasApiVersion(Version)
+    //        .WithTags(finalTag);
+
+    //    DefineEndpoints(group);
+    //}
+
 
 
     protected abstract void DefineEndpoints(IEndpointRouteBuilder app);

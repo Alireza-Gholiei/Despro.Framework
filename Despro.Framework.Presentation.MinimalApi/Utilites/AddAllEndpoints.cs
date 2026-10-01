@@ -1,18 +1,30 @@
-﻿using Despro.Framework.Presentation.MinimalApi.ControllerTools;
+﻿using Despro.Framework.Presentation.Modules;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using System.Reflection;
 
 namespace Despro.Framework.Presentation.MinimalApi.Utilites;
 
 public static class EndpointExtensions
 {
-    public static void AddAllEndpoints(this IServiceCollection services, Assembly assembly)
+    extension(IServiceCollection services)
     {
-        var serviceDescriptors = assembly.GetTypes()
-            .Where(t => t.IsAssignableTo(typeof(IEndpoint)) && t is { IsInterface: false, IsAbstract: false })
-            .Select(type => ServiceDescriptor.Scoped(typeof(IEndpoint), type));
+        public IServiceCollection AddDesproModuleEndpoints(Action<ModuleEndpointOptions> configure)
+        {
+            var options = new ModuleEndpointOptions();
+            configure(options);
+            ArgumentException.ThrowIfNullOrWhiteSpace(options.Name);
+            ArgumentNullException.ThrowIfNull(options.ApiAssembly);
 
-        services.TryAddEnumerable(serviceDescriptors);
+            services.AddSingleton(new ModuleEndpointRegistration(options));
+            return services;
+        }
+
+        public IServiceCollection AddFrameworkPresentationWebMinimalApiJson()
+        {
+            services.Configure<Microsoft.AspNetCore.Mvc.JsonOptions>(o =>
+                o.JsonSerializerOptions.PropertyNamingPolicy = null);
+            services.ConfigureHttpJsonOptions(o => o.SerializerOptions.PropertyNamingPolicy = null);
+
+            return services;
+        }
     }
 }
