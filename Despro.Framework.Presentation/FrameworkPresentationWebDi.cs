@@ -1,5 +1,4 @@
-﻿using Despro.Framework.Presentation.Modules;
-using Despro.Framework.Presentation.Utilites;
+﻿using Despro.Framework.Presentation.Utilites;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

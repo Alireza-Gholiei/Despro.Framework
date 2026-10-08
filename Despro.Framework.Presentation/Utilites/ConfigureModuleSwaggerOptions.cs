@@ -17,9 +17,10 @@ internal sealed class ConfigureModuleSwaggerOptions(
     public void Configure(SwaggerGenOptions options)
     {
         var all = registrations.ToList();
+        var separateModules = all.SeparateDocModules();
         var docs = new Dictionary<string, (string Module, string Group)>();
 
-        foreach (var module in all.SeparateDocModules())
+        foreach (var module in separateModules)
             foreach (var v in provider.ApiVersionDescriptions)
             {
                 var name = ModuleSwaggerNames.DocName(module, v.GroupName);
@@ -29,15 +30,22 @@ internal sealed class ConfigureModuleSwaggerOptions(
 
         if (docs.Count == 0) return;
 
-        var byAssembly = all.GroupBy(r => r.ApiAssembly).ToDictionary(g => g.Key, g => g.First().ModuleName);
+        var byAssembly = all.GroupBy(r => r.ApiAssembly)
+            .ToDictionary(g => g.Key, g => g.First().ModuleName);
 
         options.DocInclusionPredicate((docName, api) =>
         {
-            if (!docs.TryGetValue(docName, out var target))
-                return api.GroupName is null || api.GroupName == docName;
+            var module = ResolveModule(api, byAssembly);
 
-            return string.Equals(ResolveModule(api, byAssembly), target.Module, StringComparison.OrdinalIgnoreCase)
-                   && api.GroupName == target.Group;
+            if (docs.TryGetValue(docName, out var target))
+                return string.Equals(module, target.Module, StringComparison.OrdinalIgnoreCase) && api.GroupName == target.Group;
+
+            if (api.GroupName is not null && api.GroupName != docName)
+                return false;
+
+            return module is null
+                   || !separateModules.Contains(module, StringComparer.OrdinalIgnoreCase);
+
         });
     }
 

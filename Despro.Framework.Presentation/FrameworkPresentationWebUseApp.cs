@@ -60,6 +60,11 @@ public static class FrameworkPresentationWebUseApp
     {
         var versions = app.DescribeApiVersions();
 
+        foreach (var d in versions)
+            options.SwaggerEndpoint(
+                $"/swagger/{d.GroupName}/swagger.json",
+                $"Default {d.GroupName.ToUpperInvariant()}");
+
         foreach (var module in app.Services.GetServices<IModuleRegistration>().SeparateDocModules())
             foreach (var d in versions)
                 options.SwaggerEndpoint(
