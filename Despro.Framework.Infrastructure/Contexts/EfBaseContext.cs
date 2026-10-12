@@ -6,18 +6,16 @@ using System.Reflection;
 
 namespace Despro.Framework.Infrastructure.Contexts;
 
-public abstract class EfBaseContext(
-    DbContextOptions options,
+public abstract class EfBaseContext(DbContextOptions options,
     ICustomPublisher publisher,
     Assembly configurationsAssembly)
     : DbContext(options)
 {
+    protected virtual bool StoreSystemErrors => true;
     private readonly ICustomPublisher _publisher = publisher ?? throw new ArgumentNullException(nameof(publisher));
     private readonly Assembly _configurationsAssembly = configurationsAssembly ?? throw new ArgumentNullException(nameof(configurationsAssembly));
 
-    public override async Task<int> SaveChangesAsync(
-        bool acceptAllChangesOnSuccess,
-        CancellationToken cancellationToken = default)
+    public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
     {
         var aggregates = GetAggregatesWithEvents();
 
@@ -54,6 +52,9 @@ public abstract class EfBaseContext(
     {
         base.OnModelCreating(builder);
 
+        if (!StoreSystemErrors)
+            builder.Ignore<SystemError>();
+
         foreach (var fk in builder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))
         {
             if (!fk.IsOwnership)
@@ -64,7 +65,6 @@ public abstract class EfBaseContext(
 
         foreach (var entityType in builder.Model.GetEntityTypes())
         {
-            // QueryFilter فقط روی root entity مجازه
             if (entityType.BaseType is not null || entityType.IsOwned()) continue;
             if (!IsAggregate(entityType.ClrType)) continue;
 

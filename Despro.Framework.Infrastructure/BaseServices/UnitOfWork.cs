@@ -111,7 +111,7 @@ public abstract class UnitOfWork<TContext>(TContext dbContext, IRepositoryServic
             await transaction.CommitAsync(token);
             await repositoryServices.LoggingContext.FlushLogsAsync();
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             await transaction.RollbackAsync(token);
             throw;
@@ -128,7 +128,7 @@ public abstract class UnitOfWork<TContext>(TContext dbContext, IRepositoryServic
             await transaction.CommitAsync(token);
             await repositoryServices.LoggingContext.FlushLogsAsync();
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             await transaction.RollbackAsync(token);
             throw;
@@ -153,7 +153,7 @@ public abstract class UnitOfWork<TContext>(TContext dbContext, IRepositoryServic
             await transaction.RollbackAsync(token);
             throw new BaseRepositoryException(ex.Message);
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             await transaction.RollbackAsync(token);
             throw;

@@ -13,7 +13,7 @@ public static class FrameworkPresentationWebDi
     /// <param name="services"></param>
     /// <returns></returns>
     /// <exception cref="Exception"></exception>
-    public static IServiceCollection AddFrameworkPresentationWebMinimalApi(this IServiceCollection services, Assembly ApiAssembly, string RoutePrefix,bool SeparateSwaggerDoc)
+    public static IServiceCollection AddFrameworkPresentationWebMinimalApi(this IServiceCollection services, Assembly ApiAssembly, string RoutePrefix, bool SeparateSwaggerDoc)
     {
         services.AddDesproModuleEndpoints(o =>
         {

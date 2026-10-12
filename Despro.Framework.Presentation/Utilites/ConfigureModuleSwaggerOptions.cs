@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using Asp.Versioning.ApiExplorer;
+﻿using Asp.Versioning.ApiExplorer;
 using Despro.Framework.Presentation.Modules;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Controllers;
@@ -7,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using System.Reflection;
 
 namespace Despro.Framework.Presentation.Utilites;
 
