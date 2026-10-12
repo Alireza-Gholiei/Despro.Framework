@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Despro.Framework.Infrastructure.BaseServices;
 
-public abstract class UnitOfWork<TContext>(TContext dbContext, IRepositoryServices repositoryServices)
+public class UnitOfWork<TContext>(TContext dbContext, IRepositoryServices repositoryServices)
     : IUnitOfWork where TContext : EfBaseContext
 {
     private readonly TContext _context = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
