@@ -10,7 +10,7 @@
 		<PackageTags>Despro Framework Base</PackageTags>
 		<Description>Base Framework For Despro</Description>
 
-		<Version>2.2.2</Version>
+		<Version>2.2.3</Version>
 
 		<Authors>Despro Team</Authors>
 
@@ -43,7 +43,7 @@
 		<PackageReference Include="FluentValidation" Version="12.2.0" />
 		<PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.2.0" />
 		<PackageReference Include="Mapster" Version="10.0.13" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.12">
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.13">
 			<PrivateAssets>all</PrivateAssets>
 		</PackageReference>
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />

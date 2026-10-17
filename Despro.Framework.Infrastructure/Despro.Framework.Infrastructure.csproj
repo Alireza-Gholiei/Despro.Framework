@@ -10,7 +10,7 @@
 		<PackageTags>Despro Framework Infrastructure</PackageTags>
 		<Description>Infrastructure Framework For Despro</Description>
 
-		<Version>2.3.0</Version>
+		<Version>2.3.1</Version>
 
 		<Authors>Despro Team</Authors>
 
@@ -43,7 +43,7 @@
 		<PackageReference Include="Dapper" Version="2.1.89" />
 		<PackageReference Include="FluentValidation" Version="12.2.0" />
 		<PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.2.0" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.12" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.13" />
 		<PackageReference Include="MongoDB.Driver" Version="3.12.0" />
 		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.23.0" />
 	</ItemGroup>
