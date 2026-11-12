@@ -12,16 +12,29 @@ namespace Despro.Framework.Presentation.Utilites;
 
 internal sealed class ConfigureModuleSwaggerOptions(
     IApiVersionDescriptionProvider provider,
+    IApiDescriptionGroupCollectionProvider apiDescriptionProvider,
     IEnumerable<IModuleRegistration> registrations) : IConfigureOptions<SwaggerGenOptions>
 {
     public void Configure(SwaggerGenOptions options)
     {
         var all = registrations.ToList();
         var separateModules = all.SeparateDocModules();
+        var byAssembly = all.GroupBy(r => r.ApiAssembly)
+            .ToDictionary(g => g.Key, g => g.First().ModuleName);
+        var moduleGroups = apiDescriptionProvider.ApiDescriptionGroups.Items
+            .SelectMany(group => group.Items)
+            .Select(api => (Api: api, Module: ResolveModule(api, byAssembly)))
+            .Where(item => item.Module is not null && separateModules.Contains(item.Module, StringComparer.OrdinalIgnoreCase))
+            .GroupBy(item => item.Module!, StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(
+                group => group.Key,
+                group => group.Select(item => item.Api.GroupName).OfType<string>().ToHashSet(StringComparer.Ordinal),
+                StringComparer.OrdinalIgnoreCase);
         var docs = new Dictionary<string, (string Module, string Group)>();
 
         foreach (var module in separateModules)
-            foreach (var v in provider.ApiVersionDescriptions)
+            if (moduleGroups.TryGetValue(module, out var groups))
+                foreach (var v in provider.ApiVersionDescriptions.Where(v => groups.Contains(v.GroupName)))
             {
                 var name = ModuleSwaggerNames.DocName(module, v.GroupName);
                 docs[name] = (module, v.GroupName);
@@ -29,9 +42,6 @@ internal sealed class ConfigureModuleSwaggerOptions(
             }
 
         if (docs.Count == 0) return;
-
-        var byAssembly = all.GroupBy(r => r.ApiAssembly)
-            .ToDictionary(g => g.Key, g => g.First().ModuleName);
 
         options.DocInclusionPredicate((docName, api) =>
         {
