@@ -34,13 +34,13 @@ public static class SwaggerConfig
             return new ConfigureSwaggerOptions(provider, applicationName);
         });
 
-        services.TryAddEnumerable(ServiceDescriptor.Singleton<IConfigureOptions<SwaggerGenOptions>>(sp =>
+        services.AddSingleton<IConfigureOptions<SwaggerGenOptions>>(sp =>
         {
             var provider = sp.GetRequiredService<IApiVersionDescriptionProvider>();
             var registrations = sp.GetRequiredService<IEnumerable<IModuleRegistration>>();
 
             return new ConfigureModuleSwaggerOptions(provider, registrations);
-        }));
+        });
 
         services.AddSwaggerGen(options =>
         {
