@@ -1,5 +1,6 @@
 ﻿using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
+using Despro.Framework.Presentation.Modules;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
@@ -33,7 +34,13 @@ public static class SwaggerConfig
             return new ConfigureSwaggerOptions(provider, applicationName);
         });
 
-        services.TryAddEnumerable(ServiceDescriptor.Singleton<IConfigureOptions<SwaggerGenOptions>, ConfigureModuleSwaggerOptions>());
+        services.TryAddEnumerable(ServiceDescriptor.Singleton<IConfigureOptions<SwaggerGenOptions>>(sp =>
+        {
+            var provider = sp.GetRequiredService<IApiVersionDescriptionProvider>();
+            var registrations = sp.GetRequiredService<IEnumerable<IModuleRegistration>>();
+
+            return new ConfigureModuleSwaggerOptions(provider, registrations);
+        }));
 
         services.AddSwaggerGen(options =>
         {
