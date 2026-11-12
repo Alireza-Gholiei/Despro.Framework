@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
+using Swashbuckle.AspNetCore.SwaggerGen;
 using Swashbuckle.AspNetCore.SwaggerUI;
 
 namespace Despro.Framework.Presentation;
@@ -58,18 +60,27 @@ public static class FrameworkPresentationWebUseApp
 
     private static void ConfigureSwaggerUi(SwaggerUIOptions options, WebApplication app)
     {
-        var versions = app.DescribeApiVersions();
+        var registeredDocs = app.Services
+            .GetRequiredService<IOptions<SwaggerGenOptions>>()
+            .Value.SwaggerGeneratorOptions.SwaggerDocs;
 
-        foreach (var d in versions)
-            options.SwaggerEndpoint(
-                $"/swagger/{d.GroupName}/swagger.json",
-                $"Default {d.GroupName.ToUpperInvariant()}");
+        var modules = app.Services.GetServices<IModuleRegistration>()
+            .SeparateDocModules()
+            .OrderByDescending(m => m.Length)
+            .ToList();
 
-        foreach (var module in app.Services.GetServices<IModuleRegistration>().SeparateDocModules())
-            foreach (var d in versions)
-                options.SwaggerEndpoint(
-                    $"/swagger/{ModuleSwaggerNames.DocName(module, d.GroupName)}/swagger.json",
-                    $"{module} {d.GroupName.ToUpperInvariant()}");
+        foreach (var docName in registeredDocs.Keys)
+        {
+            var module = modules.FirstOrDefault(m =>
+                docName.StartsWith(ModuleSwaggerNames.DocName(m, string.Empty),
+                    StringComparison.OrdinalIgnoreCase));
+
+            var label = module is null
+                ? $"Default {docName.ToUpperInvariant()}"
+                : $"{module} {docName[(module.Length + 1)..].ToUpperInvariant()}";
+
+            options.SwaggerEndpoint($"/swagger/{docName}/swagger.json", label);
+        }
 
         options.DocExpansion(DocExpansion.None);
         options.DefaultModelsExpandDepth(-1);
